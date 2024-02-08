@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import { configureOpenAI } from "../config/openai-config.js";
 import { OpenAIApi } from "openai";
-export const generateChatCompleteion = async (req, res, next) => {
+export const generateChatCompletion = async (req, res, next) => {
     const { message } = req.body;
     try {
         const user = await User.findById(res.locals.jwtData.id);
