@@ -13,12 +13,13 @@ const Login = () => {
         const email = formData.get("email") as string;
         const password = formData.get("password") as string;
         try {
-            toast.loading("Singing In", { id: "login" });
+            toast.loading("Singing in...", { id: "login" });
+            console.log(email, password);
             await auth?.login(email, password);
-            toast.success("Signed In Successfully", { id: "login" })
+            toast.success("Signed in successfully!", { id: "login" })
         } catch (error) {
             console.log(error);
-            toast.error("Sign in failed" , { id: "login" });
+            toast.error("Sign in failed." , { id: "login" });
         }
     }
     return <Box width={'100%'} height={'100%'} display="flex" flex={1}>
