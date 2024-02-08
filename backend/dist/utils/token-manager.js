@@ -6,4 +6,6 @@ export const createToken = (id, email, expiresIn) => {
     });
     return token;
 };
+export const verifyToken = () => {
+};
 //# sourceMappingURL=token-manager.js.map
