@@ -18,11 +18,11 @@ export const getAllUsers = async (req, res, next) => {
 export const userLogin = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        const existingUser = await User.findOne({ email });
-        if (!existingUser) {
+        const user = await User.findOne({ email });
+        if (!user) {
             return res.status(401).send("User not registered.");
         }
-        const isPasswordCorrect = await compare(password, existingUser.password);
+        const isPasswordCorrect = await compare(password, user.password);
         if (!isPasswordCorrect) {
             return res.status(403).send("Incorrect password");
         }
@@ -32,7 +32,7 @@ export const userLogin = async (req, res, next) => {
             signed: true,
             path: "/",
         });
-        const token = createToken(existingUser._id.toString(), existingUser.email, "7d");
+        const token = createToken(user._id.toString(), user.email, "7d");
         const expires = new Date();
         expires.setDate(expires.getDate() + 7);
         res.cookie(COOKIE_NAME, token, {
@@ -42,7 +42,41 @@ export const userLogin = async (req, res, next) => {
             httpOnly: true,
             signed: true,
         });
-        return res.status(200).json({ message: "OK", id: existingUser._id.toString });
+        return res.status(200).json({ message: "OK", name: user.name, email: user.email });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(200).json({ message: "ERROR", cause: error.message });
+    }
+};
+export const userSignup = async (req, res, next) => {
+    try {
+        //user signup
+        const { name, email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (user)
+            return res.status(401).send("User already registered");
+        const hashedPassword = await hash(password, 10);
+        const userToSave = new User({ name, email, password: hashedPassword });
+        await userToSave.save();
+        // create token and store cookie
+        res.clearCookie(COOKIE_NAME, {
+            httpOnly: true,
+            domain: "localhost",
+            signed: true,
+            path: "/",
+        });
+        const token = createToken(user._id.toString(), user.email, "7d");
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 7);
+        res.cookie(COOKIE_NAME, token, {
+            path: "/",
+            domain: "localhost",
+            expires,
+            httpOnly: true,
+            signed: true,
+        });
+        return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     }
     catch (error) {
         console.log(error);
@@ -52,34 +86,16 @@ export const userLogin = async (req, res, next) => {
         });
     }
 };
-export const userSignup = async (req, res, next) => {
+export const verifyUser = async (req, res, next) => {
     try {
-        //user signup
-        const { name, email, password } = req.body;
-        const existingUser = await User.findOne({ email });
-        if (existingUser)
-            return res.status(401).send("User already registered");
-        const hashedPassword = await hash(password, 10);
-        const user = new User({ name, email, password: hashedPassword });
-        await user.save();
-        // create token and store cookie
-        res.clearCookie(COOKIE_NAME, {
-            httpOnly: true,
-            domain: "localhost",
-            signed: true,
-            path: "/",
-        });
-        const token = createToken(existingUser._id.toString(), existingUser.email, "7d");
-        const expires = new Date();
-        expires.setDate(expires.getDate() + 7);
-        res.cookie(COOKIE_NAME, token, {
-            path: "/",
-            domain: "localhost",
-            expires,
-            httpOnly: true,
-            signed: true,
-        });
-        return res.status(200).json({ message: "OK", id: user._id.toString });
+        const user = await User.findById({ email: res.locals.jwtData.id });
+        if (!user) {
+            return res.status(401).send("User not registered OR token malfunctioned");
+        }
+        if (user._id.toString() !== res.locals.jwtData.id) {
+            return res.status(401).send("Permissions didn't match");
+        }
+        return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     }
     catch (error) {
         console.log(error);
