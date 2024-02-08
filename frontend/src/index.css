@@ -24,3 +24,9 @@ html, body{
   letter-spacing: 1px;
 
 }
+
+.MuiOutlinedInput-input-root.Mui-focus,
+.MuiOutlinedInput-notchedOutline
+{
+  border-color: white !important;
+}
