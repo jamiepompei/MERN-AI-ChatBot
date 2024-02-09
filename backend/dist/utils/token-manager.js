@@ -7,6 +7,8 @@ export const createToken = (id, email, expiresIn) => {
     });
     return token;
 };
+
+export const verifyToken = () => {
 export const verifyToken = async (req, res, next) => {
     const token = req.signedCookies[`${COOKIE_NAME}`];
     if (!token || token.trim() === "") {
