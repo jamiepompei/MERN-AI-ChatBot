@@ -14,7 +14,6 @@ const Login = () => {
         const password = formData.get("password") as string;
         try {
             toast.loading("Singing in...", { id: "login" });
-            console.log(email, password);
             await auth?.login(email, password);
             toast.success("Signed in successfully!", { id: "login" })
         } catch (error) {
@@ -35,7 +34,8 @@ const Login = () => {
                         </Typography>
                         <CustomizedInput type="email" name="email" label="email"></CustomizedInput>
                         <CustomizedInput type="password" name="password" label="password"></CustomizedInput>
-                        <Button type="submit" sx={{px: 2, py: 1, mt: 2, width: "400px", borderRadius: 2, bgcolor: "#00fffc",
+                        <Button type="submit" sx={{px: 2, py: 1, mt: 2, width: "400px", borderRadius: 2, bgcolor: "#D6A2E8",
+                        color: "#2C3A47",
                         ":hover":{
                             bgcolor: "white",
                             color: "black",
