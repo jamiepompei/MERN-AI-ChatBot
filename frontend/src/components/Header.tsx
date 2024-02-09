@@ -8,49 +8,48 @@ import { useAuth } from "../context/AuthContext";
 const Header = () => {
     const auth = useAuth();
     return (
-        <AppBar 
-            sx={{ bgcolor: "transparent", position:"static",
-            boxShadow:"none",
-     }}>
+      <AppBar
+        sx={{ bgcolor: "transparent", position: "static", boxShadow: "none" }}
+      >
         <Toolbar sx={{ display: "flex" }}>
-            <Logo />
-            <div>
-                {auth?.isLoggedIn ? (
-                <>
-                <NavigationLink 
-                    bg="#D6A2E8" 
-                    to="/chat" 
-                    text="Go To Chat" 
-                    textColor="black" 
+          <Logo />
+          <div>
+            {auth?.isLoggedIn ? (
+              <>
+                <NavigationLink
+                  bg="#D6A2E8"
+                  to="/chat"
+                  text="Go To Chat"
+                  textColor="black"
                 />
-                <NavigationLink 
-                    bg="#51538f" 
-                    to="/" 
-                    text="Logout" 
-                    textColor="white" 
-                    onClick={auth.logout}
+                <NavigationLink
+                  bg="#51538f"
+                  textColor="white"
+                  to="/"
+                  text="logout"
+                  onClick={auth.logout}
                 />
-                </>
-            ):(
-                <>
-                <NavigationLink 
-                    bg="#D6A2E8" 
-                    to="/login" 
-                    text="Login" 
-                    textColor="black" 
+              </>
+            ) : (
+              <>
+                <NavigationLink
+                  bg="#D6A2E8"
+                  to="/login"
+                  text="Login"
+                  textColor="black"
                 />
-                <NavigationLink 
-                    bg="#51538f" 
-                    to="/signup" 
-                    text="Signup" 
-                    textColor="white" 
+                <NavigationLink
+                  bg="#51538f"
+                  textColor="white"
+                  to="/signup"
+                  text="Signup"
                 />
-                </>
+              </>
             )}
-            </div>
+          </div>
         </Toolbar>
-    </AppBar>
+      </AppBar>
     );
-};
+  };
 
 export default Header;
