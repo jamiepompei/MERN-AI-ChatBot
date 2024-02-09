@@ -19,3 +19,12 @@ export const sendChatRequest = async (message: string) => {
     return data;
 };
 
+export const checkAuthStatus = async () => {
+    const res = await axios.get("/user/auth-status");
+    if (res.status !== 200) {
+        throw new Error("Unable to authenticate!");
+    }
+    const data = await res.data;
+    return data;
+}
+

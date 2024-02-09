@@ -56,7 +56,7 @@ export const userLogin = async (
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error){ 
         console.log(error);
-        return res.status(200).json({ message: "ERROR", cause: error.message })
+        return res.status(200).json({ message: "ERROR", cause: error.message });
     }
 }
 
@@ -70,7 +70,7 @@ export const userSignup = async (
         const user = await User.findOne({ email });
         if (user) return res.status(401).send("User already registered");
         const hashedPassword = await hash(password, 10);
-        const userToSave = new User({ name, email, password: hashedPassword })
+        const userToSave = new User({ name, email, password: hashedPassword });
         await userToSave.save();
 
         // create token and store cookie
@@ -97,6 +97,24 @@ export const userSignup = async (
         console.log(error);
         return res.status(200).json({
             message: "ERROR", 
-            cause: error.message})
+            cause: error.message});
+    }
+}
+
+export const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById({ email: res.locals.jwtData.id });
+        if (!user) {
+            return res.status(401).send("User not registered OR token malfunctioned");
+        }
+        if (user._id.toString() !== res.locals.jwtData.id) {
+            return res.status(401).send("Permissions didn't match");
+        }
+        return res.status(200).json({ message: "OK", name: user.name, email: user.email });
+    } catch (error) {
+        console.log(error);
+        return res.status(200).json({
+            message: "ERROR", 
+            cause: error.message});
     }
 }
