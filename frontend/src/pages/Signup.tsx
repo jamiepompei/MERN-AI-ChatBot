@@ -6,6 +6,8 @@ import { toast } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AxiosError } from "axios";
+import { Error } from "mongoose";
 
 
 
@@ -22,9 +24,11 @@ const Signup = () => {
             toast.loading("Singing up...", { id: "signup" });
             await auth?.signup(name, email, password);
             toast.success("Signed up successfully!", { id: "signup" })
-        } catch (error) {
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
             console.log(error);
-            toast.error("Sign up failed." , { id: "signup" });
+            toast.error("Sign up failed. " + error.response?.data?.toString(), { id: "signup" });
+            }
         }
     }
     useEffect(() => {

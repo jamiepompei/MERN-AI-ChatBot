@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
-import { loginUser, checkAuthStatus, logOutUser } from '../helpers/api-communicator';
+import { loginUser, checkAuthStatus, logOutUser, signupUser } from '../helpers/api-communicator';
 
 type User = {
     name: string, 

@@ -3,8 +3,8 @@ import axios from "axios";
 export const loginUser = async (email: string, password: string) => {
     const res = await axios.post("/user/login", { email, password });
     if (res.status !== 200) {
-        console.log("Unable to login")
-        throw new Error ("Unable to login");
+        console.log("Unable to login.")
+        throw new Error ("Unable to login.");
     }
     const data = await res.data;
     return data;
@@ -13,7 +13,7 @@ export const loginUser = async (email: string, password: string) => {
 export const sendChatRequest = async (message: string) => {
     const res = await axios.post("/chat/new", { message } );
     if (res.status !== 200) {
-        throw new Error("Could not handle chat");
+        throw new Error("Could not handle chat.");
     }
     const data = await res.data;
     return data;
@@ -56,11 +56,11 @@ export const logOutUser = async () => {
     return data;
 };
 
-export const signupUser = async (email: string, password: string) => {
-    const res = await axios.post("/user/login", { email, password });
+export const signupUser = async (name: string, email: string, password: string) => {
+    const res = await axios.post("/user/signup", { name, email, password });
     if (res.status !== 200) {
-        console.log("Unable to login")
-        throw new Error ("Unable to login");
+        console.log("Unable to signup.")
+        throw new Error ("Unable to signup.");
     }
     const data = await res.data;
     return data;

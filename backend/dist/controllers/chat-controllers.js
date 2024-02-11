@@ -17,9 +17,9 @@ export const generateChatCompletion = async (req, res, next) => {
         const config = configureOpenAI();
         const openAI = new OpenAIApi(config);
         const chatResponse = [];
-        chatResponse.push("Hello, testing testing...");
         console.log(chatResponse);
         // @-ts-ignore
+        //remove this once api key can be accessed
         user.chats.push({ id: "helloid", role: "assistant", content: "hello, testing...testing..." });
         // await openAI.createChatCompletion({ model:"gpt-3.-turbo", messages: chats, });
         // user.chats.push(chatResponse.data.choices[0].message);
@@ -43,8 +43,6 @@ export const sendChatsToUser = async (req, res, next) => {
             console.log("could not get chats because perms did not match");
             return res.status(401).send("Permissions didn't match");
         }
-        console.log("hello world");
-        user.chats.push({ id: 1, role: "user", content: "hello world" });
         return res.status(200).json({ message: "OK", chats: user.chats });
     }
     catch (error) {
