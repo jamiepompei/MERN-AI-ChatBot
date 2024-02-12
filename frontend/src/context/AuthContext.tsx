@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const data = await signupUser(name, email, password);
         if (data) {
             setUser({ email: data.email, name: data.name });
-            setIsLoggedIn(true);
+            setIsLoggedIn(false);
         }
     };
     const logout = async () => {
