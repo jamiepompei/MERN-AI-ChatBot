@@ -22,7 +22,6 @@ const Chat = () => {
     const [chatMessages, setChatMessages] = useState<Message[]>([]);
 
     const handleSubmit = async () => {
-        console.log(inputRef.current?.value);
         const content = inputRef.current?.value as string;
         if (inputRef && inputRef.current) {
             inputRef.current.value = "";
@@ -32,6 +31,12 @@ const Chat = () => {
         const chatData = await sendChatRequest(content);
         setChatMessages(chatData?.chats ? [...chatData.chats] : []);
     };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        handleSubmit();
+      }
+    }
 
     const handleDeleteChats = async () => {
       try {
@@ -191,6 +196,7 @@ const Chat = () => {
                 color: "white",
                 fontSize: "20px",
               }}
+              onKeyDown={handleKeyDown}
             />
             <IconButton onClick={handleSubmit} sx={{ color: "white", mx: 1, padding: 3 }}>
               <IoMdSend />
