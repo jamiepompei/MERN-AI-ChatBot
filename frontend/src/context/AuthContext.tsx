@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
 import { loginUser, checkAuthStatus, logOutUser, signupUser } from '../helpers/api-communicator';
+import { AxiosError } from 'axios';
 
 type User = {
     name: string, 
@@ -16,14 +17,35 @@ const AuthContext = createContext<UserAuth | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User|null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         // fetch if the user's cookies are valid
         async function checkStatus() {
-            const data = await checkAuthStatus();
-            if (data) {
-                setUser({ email: data.email, name: data.name });
-                setIsLoggedIn(true);
+            try {
+                const data = await checkAuthStatus();
+                if (data) {
+                    setUser({ email: data.email, name: data.name });
+                    setIsLoggedIn(true);
+                }
+            } catch (error: unknown) {
+                // TODO currently, an error is thrown when a user is not logged in and accesses signup, home, or logout pages.
+                //for now, we are catching authentication status check errors, logging the response, and always setting the user
+                // null and isLoggedIn false
+                //finally, update the loading state
+                if (error instanceof AxiosError) {
+                    if (error.response) {
+                        console.error("An error occurred while checking authentication status: ", error.response.data);
+                    } else {
+                        console.error("An error occurred while checking authentication status:", error.message);
+                    }
+
+                }
+                setUser(null);
+                setIsLoggedIn(false);
+
+            } finally {
+                setLoading(false); // Update loading state regardless of success or failure
             }
         }
         checkStatus();
@@ -38,8 +60,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const signup = async (name: string, email: string, password: string) => {
         const data = await signupUser(name, email, password);
         if (data) {
-            setUser({ email: data.email, name: data.name });
-            setIsLoggedIn(true);
+            setUser(null);
+            setIsLoggedIn(false);
         }
     };
     const logout = async () => {
@@ -52,6 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const value = {
         user,
         isLoggedIn,
+        loading,
         login, 
         logout, 
         signup,

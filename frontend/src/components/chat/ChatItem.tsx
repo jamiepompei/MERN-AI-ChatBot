@@ -3,6 +3,7 @@ import { Box, Avatar, Typography } from "@mui/material";
 import { useAuth } from '../../context/AuthContext';
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkCold } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { formatNameToInitials } from '../shared/InitialFormatter';
 
 function extractCodeFromString(message: string) {
     if (message.includes("```")){
@@ -53,8 +54,7 @@ const ChatItem = ({
         ) : ( 
             <Box sx={{ display: "flex", p: 2, bgcolor: "#2C3A47", gap: 2 }}>
             <Avatar sx={{ ml: "0", bgcolor: "#D6A2E8", color: "white" }}>
-            {auth?.user?.name[0]}
-            {auth?.user?.name.split(" ")[1][0]}
+            {formatNameToInitials(auth?.user?.name)}
             </Avatar>
             <Box>
                 {!messageBlocks && (<Typography sx={{ fontSize: "20px" }}>{ content }</Typography>)}

@@ -8,6 +8,7 @@ import  ChatItem  from "../components/chat/ChatItem";
 import { sendChatRequest, getUserChats, deleteUserChats } from '../helpers/api-communicator';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { formatNameToInitials } from '../components/shared/InitialFormatter';
 
 type Message = {
     role: "user" | "assistant",
@@ -29,7 +30,7 @@ const Chat = () => {
         const newMessage: Message = { role: "user", content };
         setChatMessages((prev)=> [...prev, newMessage]);
         const chatData = await sendChatRequest(content);
-        setChatMessages([...chatData.chats]);
+        setChatMessages(chatData?.chats ? [...chatData.chats] : []);
     };
 
     const handleDeleteChats = async () => {
@@ -100,8 +101,7 @@ const Chat = () => {
                 fontWeight: 700,
               }}
             >
-              {auth?.user?.name[0]}
-              {auth?.user?.name.split(" ")[1][0]}
+              {formatNameToInitials(auth?.user?.name)}
             </Avatar>
             <Typography sx={{ mx: "auto", fontFamily: "work sans" }}>
               You are talking to a ChatBOT.
