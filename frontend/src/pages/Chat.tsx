@@ -111,7 +111,7 @@ const Chat = () => {
               education, etc, but avoid sharing personal information.
             </Typography>
             <Button
-        
+
               sx={{
                 width: "200px",
                 my: "auto",
@@ -123,7 +123,10 @@ const Chat = () => {
                 ":hover": {
                   bgcolor: red.A400,
                 },
-              }} onClick={handleDeleteChats}
+                mb: 5,
+              }} 
+              onClick={handleDeleteChats}
+              disabled={chatMessages.length === 0}
             >
               Clear Conversation
             </Button>
