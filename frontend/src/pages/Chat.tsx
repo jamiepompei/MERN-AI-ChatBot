@@ -16,6 +16,8 @@ type Message = {
 }
 
 const Chat = () => {
+  const [inputValue, setInputValue] = useState<string>();
+
     const navigate = useNavigate();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const auth = useAuth();
@@ -26,6 +28,7 @@ const Chat = () => {
         if (inputRef && inputRef.current) {
             inputRef.current.value = "";
         }
+        if (content) {
         const newMessage: Message = { role: "user", content };
         setChatMessages((prev)=> [...prev, newMessage]);
         const chatData = await sendChatRequest(content);
@@ -33,7 +36,8 @@ const Chat = () => {
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter') {
+      const content = inputRef.current?.value as string;
+      if (content && event.key === 'Enter') {
         handleSubmit();
       }
     }
@@ -184,7 +188,8 @@ const Chat = () => {
             }}
           >
             {" "}
-            <input
+            <input   
+              onChange={(e) => setInputValue(e.target.value)}
               ref= {inputRef}
               type="text"
               style={{
@@ -198,7 +203,11 @@ const Chat = () => {
               }}
               onKeyDown={handleKeyDown}
             />
-            <IconButton onClick={handleSubmit} sx={{ color: "white", mx: 1, padding: 3 }}>
+            <IconButton 
+            onClick={handleSubmit} 
+            sx={{ color: "white", mx: 1, padding: 3 }}
+            disabled={!inputValue}
+            >
               <IoMdSend />
             </IconButton>
           </div>
