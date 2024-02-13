@@ -33,7 +33,8 @@ const Chat = () => {
         setChatMessages((prev)=> [...prev, newMessage]);
         const chatData = await sendChatRequest(content);
         setChatMessages(chatData?.chats ? [...chatData.chats] : []);
-    };
+    }
+  }
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       const content = inputRef.current?.value as string;
