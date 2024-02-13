@@ -16,22 +16,32 @@ type Message = {
 }
 
 const Chat = () => {
+  const [inputValue, setInputValue] = useState<string>();
+
     const navigate = useNavigate();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const auth = useAuth();
     const [chatMessages, setChatMessages] = useState<Message[]>([]);
 
     const handleSubmit = async () => {
-        console.log(inputRef.current?.value);
         const content = inputRef.current?.value as string;
         if (inputRef && inputRef.current) {
             inputRef.current.value = "";
         }
+        if (content) {
         const newMessage: Message = { role: "user", content };
         setChatMessages((prev)=> [...prev, newMessage]);
         const chatData = await sendChatRequest(content);
         setChatMessages(chatData?.chats ? [...chatData.chats] : []);
-    };
+    }
+  }
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      const content = inputRef.current?.value as string;
+      if (content && event.key === 'Enter') {
+        handleSubmit();
+      }
+    }
 
     const handleDeleteChats = async () => {
       try {
@@ -111,7 +121,7 @@ const Chat = () => {
               education, etc, but avoid sharing personal information.
             </Typography>
             <Button
-        
+
               sx={{
                 width: "200px",
                 my: "auto",
@@ -123,7 +133,10 @@ const Chat = () => {
                 ":hover": {
                   bgcolor: red.A400,
                 },
-              }} onClick={handleDeleteChats}
+                mb: 5,
+              }} 
+              onClick={handleDeleteChats}
+              disabled={chatMessages.length === 0}
             >
               Clear Conversation
             </Button>
@@ -176,7 +189,8 @@ const Chat = () => {
             }}
           >
             {" "}
-            <input
+            <input   
+              onChange={(e) => setInputValue(e.target.value)}
               ref= {inputRef}
               type="text"
               style={{
@@ -188,8 +202,13 @@ const Chat = () => {
                 color: "white",
                 fontSize: "20px",
               }}
+              onKeyDown={handleKeyDown}
             />
-            <IconButton onClick={handleSubmit} sx={{ color: "white", mx: 1, padding: 3 }}>
+            <IconButton 
+            onClick={handleSubmit} 
+            sx={{ color: "white", mx: 1, padding: 3 }}
+            disabled={!inputValue}
+            >
               <IoMdSend />
             </IconButton>
           </div>
