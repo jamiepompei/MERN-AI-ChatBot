@@ -1,16 +1,13 @@
-import { Request } from "express-validator/src/base.js";
-import User from "../models/User.js"
-import { NextFunction, Response } from "express";
-import { hash, compare } from "bcrypt";
-import { createToken } from "../utils/token-manager.js";
-import { COOKIE_NAME } from "../utils/constants.js";
+import { NextFunction, Response, Request } from "express";
+import { getAllUsers, getUserByEmail, saveUser, getUserById } from "../services/user-services.js";
+import { verifyPassword, verifyUserByEmail, getToken, createCookie, clearCookie, hashPassword, verifyUserByTokenId, verifyTokenId } from "../services/authentication-services.js";
 
-export const getAllUsers = async (
+export const getAllUsersController = async (
     req: Request, 
     res: Response, 
     next: NextFunction) => {
     try {
-        const users = await User.find();
+        const users = getAllUsers();
         return res.status(200).json({ message: "OK", users});
     } catch (error){ 
         console.log(error);
@@ -20,79 +17,38 @@ export const getAllUsers = async (
     }
 };
 
-export const userLogin = async (
+export const userLoginController = async (
     req: Request, 
     res: Response, 
     next: NextFunction) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne( { email });
-        if (!user) {
-            return res.status(401).send("User not registered.");
-        }
-        const isPasswordCorrect = await compare(password, user.password);
-        if (!isPasswordCorrect) {
-         return res.status(403).send("Incorrect password");
-        }
-
-        res.clearCookie(COOKIE_NAME, {
-            httpOnly: true,
-            domain: "localhost",
-            signed: true,
-            path: "/",
-        });
-
-        const token = createToken(user._id.toString(), user.email, "7d");
-        const expires = new Date();
-        expires.setDate(expires.getDate() + 7);
-        res.cookie(COOKIE_NAME, token, {
-             path: "/", 
-             domain: "localhost", 
-             expires,
-             httpOnly: true,
-             signed: true,
-        });
-
+        const user = await getUserByEmail(email);
+        verifyUserByEmail(user, true);
+        await verifyPassword(password, user.password);
+        handleClearAndCreateCookie(res,user);
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error){ 
+        // TO DO fix error handling
         console.log(error);
+        if (error.status === 401) {
+            throw new Error("User is not registered. Sign up and then try logging in.");
+        }
         return res.status(200).json({ message: "ERROR", cause: error.message });
     }
 };
 
-export const userSignup = async (
+export const userSignupController = async (
     req: Request, 
     res: Response, 
     next: NextFunction) => {
     try {
-        //user signup
         const { name, email, password } = req.body;
-        const user = await User.findOne({ email });
-        console.log("user " + user);
-        if (user) return res.status(401).send("User already registered");
-        const hashedPassword = await hash(password, 10);
-        const userToSave = new User({ name, email, password: hashedPassword });
-        await userToSave.save();
-
-        // create token and store cookie
-        res.clearCookie(COOKIE_NAME, {
-            httpOnly: true,
-            domain: "localhost",
-            signed: true,
-            path: "/",
-        });
-
-        const token = createToken(user._id.toString(), user.email, "7d");
-        const expires = new Date();
-        expires.setDate(expires.getDate() + 7);
-        res.cookie(COOKIE_NAME, token, {
-             path: "/", 
-             domain: "localhost", 
-             expires,
-             httpOnly: true,
-             signed: true,
-        });
-
+        const user = await getUserByEmail(email);
+        verifyUserByEmail(user, false);
+        const hashedPassword = await hashPassword(password);
+        await saveUser(name, email, hashedPassword);
+        handleClearAndCreateCookie(res, user);
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error){ 
         console.log(error);
@@ -102,21 +58,12 @@ export const userSignup = async (
     }
 };
 
-export const userLogout = async (req: Request, res: Response, next: NextFunction) => {
+export const userLogoutController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findById(res.locals.jwtData.id);
-        if (!user) {
-            return res.status(401).send("User not registered OR token malfunctioned");
-        }
-        if (user._id.toString() !== res.locals.jwtData.id) {
-            return res.status(401).send("Permissions didn't match");
-        }
-        res.clearCookie(COOKIE_NAME, {
-            httpOnly: true,
-            domain: "localhost",
-            signed: true,
-            path: "/"
-        })
+        const user = await getUserById(res.locals.jwtData.id);
+        verifyUserByTokenId(user);
+        verifyTokenId(user._id.toString(), res.locals.jwtData.id);
+        handleClearCookie(res);
         return res.status(200).json({ message: "OK"});
     } catch (error) {
         console.log(error);
@@ -128,18 +75,27 @@ export const userLogout = async (req: Request, res: Response, next: NextFunction
 
 export const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findById( res.locals.jwtData.id);
-        if (!user) {
-            return res.status(401).send("User not registered OR token malfunctioned");
-        }
-        if (user._id.toString() !== res.locals.jwtData.id) {
-            return res.status(401).send("Permissions didn't match");
-        }
+        const user = await getUserById(res.locals.jwtData.id);
+        verifyUserByTokenId(user);
+        verifyTokenId(user._id.toString(), res.locals.jwtData.id);
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error) {
         console.log(error);
         return res.status(200).json({
             message: "ERROR", 
             cause: error.message});
-    }
+    };
 }
+
+// Helper method to handle token-related logic
+const handleClearAndCreateCookie = (res: Response, user: any) => {
+    clearCookie(res);
+    const token = getToken(user._id.toString(), user.email, "7d");
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 7);
+    createCookie(res, token, expires);
+};
+
+const handleClearCookie = (res: Response) => {
+    clearCookie(res);
+};
