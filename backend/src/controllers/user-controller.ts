@@ -29,10 +29,17 @@ export const userLoginController = async (
         handleClearAndCreateCookie(res,user);
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error){ 
-        // TO DO fix error handling
         console.log(error);
-        if (error.status === 401) {
-            throw new Error("User is not registered. Sign up and then try logging in.");
+        if (error.cause === 401) {
+            return res.status(401).json({
+                message: "User is not registered. Sign up and then try logging in.",
+                cause: error.message
+            });
+        } else if (error.cause === 403) {
+            return res.status(403).json({
+                message: "Incorrect password.",
+                cause: error.message
+            });
         }
         return res.status(200).json({ message: "ERROR", cause: error.message });
     }
@@ -52,6 +59,12 @@ export const userSignupController = async (
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error){ 
         console.log(error);
+        if (error.cause === 401) {
+            return res.status(401).json({
+                message: "User is already registered. Navigate to the login page and login.",
+                cause: error.message
+            });
+        }
         return res.status(200).json({
             message: "ERROR", 
             cause: error.message});
@@ -67,6 +80,17 @@ export const userLogoutController = async (req: Request, res: Response, next: Ne
         return res.status(200).json({ message: "OK"});
     } catch (error) {
         console.log(error);
+        if (error.cause === 401) {
+            return res.status(401).json({
+                message: "Authentication error validating user. Navigate to the login page and login again.",
+                cause: error.message
+            });
+        } else if (error.cause === 403) {
+            return res.status(403).json({
+                message: "Authentication error validating token. Navigate to the login page and login again.",
+                cause: error.message
+            });
+        }
         return res.status(200).json({
             message: "ERROR", 
             cause: error.message});
@@ -81,6 +105,17 @@ export const verifyUser = async (req: Request, res: Response, next: NextFunction
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error) {
         console.log(error);
+        if (error.cause === 401) {
+            return res.status(401).json({
+                message: "Authentication error validating user. Navigate to the login page and login again.",
+                cause: error.message
+            });
+        } else if (error.cause === 403) {
+            return res.status(403).json({
+                message: "Authentication error validating token. Navigate to the login page and login again.",
+                cause: error.message
+            });
+        }
         return res.status(200).json({
             message: "ERROR", 
             cause: error.message});
