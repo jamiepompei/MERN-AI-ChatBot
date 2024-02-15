@@ -4,7 +4,7 @@ export const getAllUsers = async () => {
         return await User.find();
     }
     catch (error) {
-        throw new Error("Error fetching users " + error.data.message);
+        throw new Error("Error fetching users " + error.message);
     }
 };
 export const getUserByEmail = async (email) => {
@@ -12,7 +12,7 @@ export const getUserByEmail = async (email) => {
         return await User.findOne({ email });
     }
     catch (error) {
-        throw new Error("Error fetching user by email " + error.data.message);
+        throw new Error("Error fetching user by email " + error.message);
     }
 };
 export const getUserById = async (id) => {
@@ -20,16 +20,16 @@ export const getUserById = async (id) => {
         return await User.findById(id);
     }
     catch (error) {
-        throw new Error("Error fetching user by id " + error.data.message);
+        throw new Error("Error fetching user by id " + error.message);
     }
 };
 export const saveUser = async (name, email, hashedPassword) => {
     try {
         const userToSave = new User({ name, email, hashedPassword });
-        await userToSave.save();
+        return await userToSave.save();
     }
     catch (error) {
-        throw new Error("Error saving user: " + error.data.message);
+        throw new Error("Error saving user: " + error.message);
     }
     ;
 };

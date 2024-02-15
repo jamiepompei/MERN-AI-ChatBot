@@ -1,7 +1,4 @@
 import { compare, hash } from 'bcrypt';
-import { createToken } from "../utils/token-manager.js";
-import { COOKIE_NAME } from "../utils/constants.js";
-import { Response } from 'express';
 
 export const verifyUserByEmail = (user: any, shouldExist: boolean) => {
     if (shouldExist) {
@@ -42,29 +39,6 @@ export const verifyTokenId = (userId: any, jwtId: any) => {
         error.cause = 403;
         throw error;
     }
-};
-
-export const getToken = (userId: any, userEmail: string, tokenttl: string) => {
-    createToken(userId, userEmail, tokenttl);  
-};
-
-export const createCookie = (res: Response, token: any, expires: any) => {
-    res.cookie(COOKIE_NAME, token, {
-        path: "/", 
-        domain: "localhost", 
-        expires,
-        httpOnly: true,
-        signed: true,
-   });
-};
-
-export const clearCookie = (res: Response) => {
-    res.clearCookie(COOKIE_NAME, {
-        httpOnly: true,
-        domain: "localhost",
-        signed: true,
-        path: "/",
-    });
 };
 
 export const hashPassword = async (password: string) => {

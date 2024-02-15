@@ -1,6 +1,9 @@
 import { NextFunction, Response, Request } from "express";
 import { getAllUsers, getUserByEmail, saveUser, getUserById } from "../services/user-services.js";
-import { verifyPassword, verifyUserByEmail, getToken, createCookie, clearCookie, hashPassword, verifyUserByTokenId, verifyTokenId } from "../services/authentication-services.js";
+import { verifyPassword, verifyUserByEmail, hashPassword, verifyUserByTokenId, verifyTokenId } from "../services/authentication-services.js";
+import { createToken } from "../utils/token-manager.js";
+import { COOKIE_NAME } from "../utils/constants.js";
+
 
 export const getAllUsersController = async (
     req: Request, 
@@ -24,9 +27,28 @@ export const userLoginController = async (
     try {
         const { email, password } = req.body;
         const user = await getUserByEmail(email);
+        console.log("User " + user);
         verifyUserByEmail(user, true);
         await verifyPassword(password, user.password);
-        handleClearAndCreateCookie(res,user);
+        
+        res.clearCookie(COOKIE_NAME, {
+            httpOnly: true,
+            domain: "localhost",
+            signed: true,
+            path: "/",
+        });
+
+        const token = createToken(user._id.toString(), user.email, "7d");
+        console.log("token " + token);
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 7);
+        res.cookie(COOKIE_NAME, token, {
+             path: "/", 
+             domain: "localhost", 
+             expires,
+             httpOnly: true,
+             signed: true,
+        });
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error){ 
         console.log(error);
@@ -54,10 +76,25 @@ export const userSignupController = async (
         const user = await getUserByEmail(email);
         verifyUserByEmail(user, false);
         const hashedPassword = await hashPassword(password);
-        await saveUser(name, email, hashedPassword);
-        handleClearAndCreateCookie(res, user);
+        const userToSave = await saveUser(name, email, hashedPassword);
+        res.clearCookie(COOKIE_NAME, {
+            httpOnly: true,
+            domain: "localhost",
+            signed: true,
+            path: "/",
+        });
+        const token = createToken(userToSave._id.toString(), userToSave.email, "7d");
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 7);
+        res.cookie(COOKIE_NAME, token, {
+             path: "/", 
+             domain: "localhost", 
+             expires,
+             httpOnly: true,
+             signed: true,
+        });
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
-    } catch (error){ 
+    } catch (error) { 
         console.log(error);
         if (error.cause === 401) {
             return res.status(401).json({
@@ -76,7 +113,12 @@ export const userLogoutController = async (req: Request, res: Response, next: Ne
         const user = await getUserById(res.locals.jwtData.id);
         verifyUserByTokenId(user);
         verifyTokenId(user._id.toString(), res.locals.jwtData.id);
-        handleClearCookie(res);
+        res.clearCookie(COOKIE_NAME, {
+            httpOnly: true,
+            domain: "localhost",
+            signed: true,
+            path: "/",
+        });
         return res.status(200).json({ message: "OK"});
     } catch (error) {
         console.log(error);
@@ -121,16 +163,3 @@ export const verifyUser = async (req: Request, res: Response, next: NextFunction
             cause: error.message});
     };
 }
-
-// Helper method to handle token-related logic
-const handleClearAndCreateCookie = (res: Response, user: any) => {
-    clearCookie(res);
-    const token = getToken(user._id.toString(), user.email, "7d");
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 7);
-    createCookie(res, token, expires);
-};
-
-const handleClearCookie = (res: Response) => {
-    clearCookie(res);
-};
