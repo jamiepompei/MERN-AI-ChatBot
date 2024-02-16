@@ -2,38 +2,22 @@ import { NextFunction, Response, Request } from "express";
 import User from "../models/User.js";
 import { configureOpenAI } from "../config/openai-config.js";
 import { OpenAIApi, ChatCompletionRequestMessage } from "openai";
+import { UserService } from "../services/user-services.js";
+import { verifyUserByTokenId } from "../services/authentication-services.js";
+import { ChatService } from "../services/chat-services.js";
 
+const chatService = new ChatService();
+const userService = new UserService();
 
-export const generateChatCompletion = async (req: Request, res: Response, next: NextFunction) => {
+export const generateChatCompletionController = async (req: Request, res: Response, next: NextFunction) => {
     const { message } = req.body;
    try {
     console.log("received the following message to reply to {message} ", message);
-    //TO DO refactor to service to find user
-        const user = await User.findById(res.locals.jwtData.id);
-        console.log("user {user}", user);
-        if(!user) return res.status(401).json({message:"User not registered or token malfunctioned"}); 
-
-        // grab chats of user
-        // TO DO refactor to get chats to chat service
-        const chats = user.chats.map(({role, content}) => ({ role, content })) as ChatCompletionRequestMessage[];
-            chats.push({ content: message, role: "user" });
-            user.chats.push({content: message, role: "user"});
-        
-        // send all chats with new one to openai api
-        // TO DO refactor to openAIApi service 
-        const config = configureOpenAI();
-        const openAI = new OpenAIApi(config);
-        const chatResponse = [];
-        console.log(chatResponse);
-        // @-ts-ignore
-        //remove this once api key can be accessed
-        user.chats.push({id: "helloid", role: "assistant", content: "hello, testing...testing..."});
-        // await openAI.createChatCompletion({ model:"gpt-3.-turbo", messages: chats, });
-        // user.chats.push(chatResponse.data.choices[0].message);
-
-        // TO DO refactor to user service
-        await user.save();
-        return res.status(200).json({ chats: user.chats });
+   
+    const userId = res.locals.jwtData.id;
+    const chats = await chatService.generateChatCompletion(userId, message);
+    
+    return res.status(200).json({ chats });
    } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
