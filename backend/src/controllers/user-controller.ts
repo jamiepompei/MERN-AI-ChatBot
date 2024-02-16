@@ -1,16 +1,17 @@
 import { NextFunction, Response, Request } from "express";
-import { getAllUsers, getUserByEmail, saveUser, getUserById } from "../services/user-services.js";
 import { verifyPassword, verifyUserByEmail, hashPassword, verifyUserByTokenId, verifyTokenId } from "../services/authentication-services.js";
 import { createToken } from "../utils/token-manager.js";
 import { COOKIE_NAME } from "../utils/constants.js";
+import { UserService } from "../services/user-services.js";
 
+const userService = new UserService();
 
 export const getAllUsersController = async (
     req: Request, 
     res: Response, 
     next: NextFunction) => {
     try {
-        const users = getAllUsers();
+        const users = userService.getAllUsers();
         return res.status(200).json({ message: "OK", users});
     } catch (error){ 
         console.log(error);
@@ -26,7 +27,7 @@ export const userLoginController = async (
     next: NextFunction) => {
     try {
         const { email, password } = req.body;
-        const user = await getUserByEmail(email);
+        const user = await userService.getUserByEmail(email);
         console.log("User " + user);
         verifyUserByEmail(user, true);
         await verifyPassword(password, user.password);
@@ -73,10 +74,10 @@ export const userSignupController = async (
     next: NextFunction) => {
     try {
         const { name, email, password } = req.body;
-        const user = await getUserByEmail(email);
+        const user = await userService.getUserByEmail(email);
         verifyUserByEmail(user, false);
         const hashedPassword = await hashPassword(password);
-        const userToSave = await saveUser(name, email, hashedPassword);
+        const userToSave = await userService.saveUser(name, email, hashedPassword);
         res.clearCookie(COOKIE_NAME, {
             httpOnly: true,
             domain: "localhost",
@@ -110,7 +111,7 @@ export const userSignupController = async (
 
 export const userLogoutController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await getUserById(res.locals.jwtData.id);
+        const user = await userService.getUserById(res.locals.jwtData.id);
         verifyUserByTokenId(user);
         verifyTokenId(user._id.toString(), res.locals.jwtData.id);
         res.clearCookie(COOKIE_NAME, {
@@ -141,7 +142,7 @@ export const userLogoutController = async (req: Request, res: Response, next: Ne
 
 export const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await getUserById(res.locals.jwtData.id);
+        const user = await userService.getUserById(res.locals.jwtData.id);
         verifyUserByTokenId(user);
         verifyTokenId(user._id.toString(), res.locals.jwtData.id);
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });

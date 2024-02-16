@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import mongoose from "mongoose";
 
 interface Chat {
-    id: string;
+    id?: string;
     role: string;
     content: string;
 }
