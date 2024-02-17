@@ -1,49 +1,50 @@
 import { compare, hash } from 'bcrypt';
-import { UserDTO } from '../models/user.js';
-
 export class AuthenticationService {
-
-    async verifyUserByEmail(user: UserDTO, shouldExist: boolean): Promise<void> {
+    async verifyUserByEmail(user, shouldExist) {
         if (shouldExist) {
             if (!user) {
                 const error = new Error("User is not registered.");
                 error.cause = 401;
                 throw error;
-        };
-        } else  {
+            }
+            ;
+        }
+        else {
             if (user) {
                 const error = new Error("User is already registered.");
                 error.cause = 409;
                 throw error;
-                };
+            }
+            ;
         }
-    };
-
-  verifyUserByTokenId(user: UserDTO): void {
+    }
+    ;
+    verifyUserByTokenId(user) {
         if (!user) {
             const error = new Error("User not registered OR token malfunctioned");
             error.cause = 401;
             throw error;
         }
     }
-
-    async verifyPassword(passwordToVerify: string, existingPassword: string): Promise<void> {
+    async verifyPassword(passwordToVerify, existingPassword) {
         if (!(await compare(passwordToVerify, existingPassword))) {
             const error = new Error("Incorrect password.");
             error.cause = 403;
             throw error;
         }
-    };
-
-    verifyTokenId(userId: string, jwtId: string): void {
+    }
+    ;
+    verifyTokenId(userId, jwtId) {
         if (userId !== jwtId) {
             const error = new Error("Permissions did not match.");
             error.cause = 403;
             throw error;
         }
-    };
-
-    async hashPassword(password: string): Promise<string> {
+    }
+    ;
+    async hashPassword(password) {
         return await hash(password, 10);
-    };
+    }
+    ;
 }
+//# sourceMappingURL=authentication-service.js.map

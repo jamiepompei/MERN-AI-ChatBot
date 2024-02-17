@@ -1,9 +1,9 @@
 import { Types } from "mongoose";
-import User, { IUser } from "../models/user.js";
+import User, { UserDTO } from "../models/user.js";
 
 export class UserService{
 
-async getAllUsers(): Promise<IUser[] | null> {
+async getAllUsers(): Promise<UserDTO[] | null> {
     try {
     return await User.find();
     } catch (error) {
@@ -11,7 +11,7 @@ async getAllUsers(): Promise<IUser[] | null> {
     }
 };
 
-async getUserByEmail(email: string): Promise<IUser | null> {
+async getUserByEmail(email: string): Promise<UserDTO | null> {
     try {
    return await User.findOne({ email });
     } catch (error) {
@@ -19,7 +19,7 @@ async getUserByEmail(email: string): Promise<IUser | null> {
     }
 };
 
-async getUserById(id: Types.ObjectId): Promise<IUser | null> {
+async getUserById(id: Types.ObjectId): Promise<UserDTO | null> {
     try {
     return await User.findById(id);
     } catch (error) {
@@ -27,7 +27,7 @@ async getUserById(id: Types.ObjectId): Promise<IUser | null> {
     }
 };
 
-async saveUser(name: string, email: string, hashedPassword: string): Promise<IUser | null > {
+async saveUser(name: string, email: string, hashedPassword: string): Promise<UserDTO | null > {
     try {
         const userToSave = new User({ name, email, hashedPassword });
         return await userToSave.save();

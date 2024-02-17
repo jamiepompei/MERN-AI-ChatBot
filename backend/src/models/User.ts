@@ -6,7 +6,7 @@ interface Chat {
     content: string;
 }
 
-export interface User extends Document {
+export interface UserDTO extends Document {
     _id: mongoose.Types.ObjectId;
     name: string;
     email: string;
@@ -46,4 +46,4 @@ const userSchema = new mongoose.Schema({
     chats: [chatSchema],
 });
 
-export default mongoose.model<User>("User", userSchema);
+export default mongoose.model<UserDTO>("User", userSchema);
