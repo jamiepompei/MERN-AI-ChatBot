@@ -1,9 +1,9 @@
 import { ChatCompletionRequestMessage, OpenAIApi } from "openai";
-import { AuthenticationService } from "./authentication-services.js";
+import { AuthenticationService } from "./authentication-service.js";
 import { configureOpenAI } from "../config/openai-config.js";
-import { IUser} from "../models/User.js";
+import { IUser} from "../models/user.js";
 import { Types } from "mongoose";
-import { UserService } from "./user-services.js";
+import { UserService } from "./user-service.js";
 
 
 const userService = new UserService();
