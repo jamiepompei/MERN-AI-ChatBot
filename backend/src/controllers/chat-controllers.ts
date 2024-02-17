@@ -1,10 +1,12 @@
 import { NextFunction, Response, Request } from "express";
 import { UserService } from "../services/user-services.js";
-import { verifyUserByTokenId } from "../services/authentication-services.js";
+import { AuthenticationService } from "../services/authentication-services.js";
 import { ChatService } from "../services/chat-services.js";
+import { errorMiddleware } from "../utils/errorMiddleware.js";
 
 const chatService = new ChatService();
 const userService = new UserService();
+const authService = new AuthenticationService();
 
 export const generateChatCompletionController = async (req: Request, res: Response, next: NextFunction) => {
     const { message } = req.body;
@@ -14,8 +16,7 @@ export const generateChatCompletionController = async (req: Request, res: Respon
     const chats = await chatService.generateChatCompletion(userId, message);
     return res.status(200).json({ chats });
    } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return next(error);
    }
 };
 
@@ -34,10 +35,7 @@ export const sendChatsToUser = async (req: Request, res: Response, next: NextFun
         }
         return res.status(200).json({ message: "OK", chats: user.chats });
     } catch (error) {
-        console.log(error);
-        return res.status(200).json({
-            message: "ERROR", 
-            cause: error.message});
+        return next(error);
     }
 };
 
@@ -57,9 +55,7 @@ export const deleteChats = async (req: Request, res: Response, next: NextFunctio
         await userService.saveUser(user.name, user.email, user.password);
         return res.status(200).json({ message: "OK" });
     } catch (error) {
-        console.log(error);
-        return res.status(200).json({
-            message: "ERROR", 
-            cause: error.message});
+        return next(error);
     }
 };
+export default errorMiddleware;
