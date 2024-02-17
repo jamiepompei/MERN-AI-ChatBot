@@ -1,9 +1,9 @@
 import { NextFunction, Response, Request } from "express";
 import { createToken } from "../utils/token-manager.js";
 import { COOKIE_NAME } from "../utils/constants.js";
-import { UserService } from "../services/user-services.js";
-import { AuthenticationService } from "../services/authentication-services.js";
-import { errorMiddleware } from '../utils/middleware.js';
+import { UserService } from "../services/user-service.js";
+import { AuthenticationService } from "../services/authentication-service.js";
+import { errorMiddleware } from '../utils/error-middleware.js';
 
 const userService = new UserService();
 const authenticationService = new AuthenticationService();

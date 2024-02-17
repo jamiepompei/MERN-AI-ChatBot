@@ -1,8 +1,8 @@
 import { NextFunction, Response, Request } from "express";
-import { UserService } from "../services/user-services.js";
-import { AuthenticationService } from "../services/authentication-services.js";
-import { ChatService } from "../services/chat-services.js";
-import { errorMiddleware } from "../utils/middleware.js";
+import { UserService } from "../services/user-service.js";
+import { AuthenticationService } from "../services/authentication-service.js";
+import { ChatService } from "../services/chat-service.js";
+import { errorMiddleware } from "../utils/error-middleware.js";
 
 const chatService = new ChatService();
 const userService = new UserService();

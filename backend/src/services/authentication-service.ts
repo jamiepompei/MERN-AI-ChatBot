@@ -1,5 +1,5 @@
 import { compare, hash } from 'bcrypt';
-import { IUser } from '../models/User.js';
+import { IUser } from '../models/user.js';
 
 export class AuthenticationService {
 

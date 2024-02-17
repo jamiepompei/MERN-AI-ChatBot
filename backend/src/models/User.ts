@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import mongoose from "mongoose";
 
 interface Chat {
@@ -7,7 +6,7 @@ interface Chat {
     content: string;
 }
 
-export interface IUser extends Document {
+export interface User extends Document {
     _id: mongoose.Types.ObjectId;
     name: string;
     email: string;
@@ -47,4 +46,4 @@ const userSchema = new mongoose.Schema({
     chats: [chatSchema],
 });
 
-export default mongoose.model<IUser>("User", userSchema);
+export default mongoose.model<User>("User", userSchema);
