@@ -22,17 +22,10 @@ export const generateChatCompletionController = async (req: Request, res: Respon
 
 export const sendChatsToUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // user token check
         const user = await userService.getUserById(res.locals.jwtData.id);
         
-        //TO DO refactor to a permission service
-        if (!user) {
-            return res.status(401).send("User not registered OR token malfunctioned");
-        }
-        if (user._id.toString() !== res.locals.jwtData.id) {
-            console.log("could not get chats because perms did not match")
-            return res.status(401).send("Permissions didn't match");
-        }
+        authService.verifyUserByTokenId(user);
+        authService.verifyTokenId(user._id.toString(),res.locals.jwtData.id.toString())
         return res.status(200).json({ message: "OK", chats: user.chats });
     } catch (error) {
         return next(error);
@@ -41,17 +34,12 @@ export const sendChatsToUser = async (req: Request, res: Response, next: NextFun
 
 export const deleteChats = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // user token check
         const user = await userService.getUserById(res.locals.jwtData.id);
-        //TO DO refactor to permission service
-        if (!user) {
-            return res.status(401).send("User not registered OR token malfunctioned");
-        }
-        if (user._id.toString() !== res.locals.jwtData.id) {
-            return res.status(401).send("Permissions didn't match");
-        }
+        authService.verifyUserByTokenId(user);
+        authService.verifyTokenId(user._id.toString(), res.locals.jwtData.id.toString());
+        
         user.chats = [];
-        console.log("user chats {user.chats} ", user.chats);
+       
         await userService.saveUser(user.name, user.email, user.password);
         return res.status(200).json({ message: "OK" });
     } catch (error) {

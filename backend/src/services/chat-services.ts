@@ -1,16 +1,13 @@
 import { ChatCompletionRequestMessage, OpenAIApi } from "openai";
-import { verifyUserByTokenId } from "./authentication-services.js";
+import { AuthenticationService } from "./authentication-services.js";
 import { configureOpenAI } from "../config/openai-config.js";
-import User, { IUser, User } from "../models/User.js";
+import { IUser} from "../models/User.js";
 import { Types } from "mongoose";
 import { UserService } from "./user-services.js";
 
 
-// Cast the document to User interface
-
-// const user: User = UserDocument.toObject() as User;
-
 const userService = new UserService();
+const authService = new AuthenticationService();
 
 export class ChatService {
 
@@ -18,7 +15,7 @@ export class ChatService {
         try {
             const user: IUser = await userService.getUserById(userId);
             console.log("user {user}", user);
-            verifyUserByTokenId(user);
+            authService.verifyUserByTokenId(user);
             const chats =  this.getUserChats(user, message);
             const config = configureOpenAI();
             const openAI = new OpenAIApi(config);
