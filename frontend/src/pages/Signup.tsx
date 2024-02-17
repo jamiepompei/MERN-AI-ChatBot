@@ -14,6 +14,13 @@ const Signup = () => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const name = formData.get("name") as string;
+        const trimmedName = name.trim();
+        const twoWordsRegex = /^\S+\s+\S+$/;
+        
+    if (!twoWordsRegex.test(trimmedName)) {
+      toast.error('Please enter a first and last name.');
+      return;
+    }
         const email = formData.get("email") as string;
         const password = formData.get("password") as string;
         try {
