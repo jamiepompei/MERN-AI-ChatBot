@@ -1,6 +1,5 @@
 import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
-import { loginUser, checkAuthStatus, logOutUser, signupUser } from '../helpers/api-communicator';
-import { AxiosError } from 'axios';
+import { loginUser, checkAuthStatus, logOutUser, signupUser } from '../helpers/api-service';
 
 type User = {
     name: string, 
@@ -33,17 +32,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 //for now, we are catching authentication status check errors, logging the response, and always setting the user
                 // null and isLoggedIn false
                 //finally, update the loading state
-                if (error instanceof AxiosError) {
-                    if (error.response) {
-                        console.error("An error occurred while checking authentication status: ", error.response.data);
-                    } else {
+                if (error instanceof Error) {
                         console.error("An error occurred while checking authentication status:", error.message);
                     }
-
-                }
                 setUser(null);
                 setIsLoggedIn(false);
-
             } finally {
                 setLoading(false); // Update loading state regardless of success or failure
             }

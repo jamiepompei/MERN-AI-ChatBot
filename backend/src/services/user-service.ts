@@ -1,6 +1,9 @@
-import User from "../models/User.js";
+import { Types } from "mongoose";
+import User, { IUser } from "../models/user.js";
 
-export const getAllUsers = async ()=> {
+export class UserService{
+
+async getAllUsers(): Promise<IUser[] | null> {
     try {
     return await User.find();
     } catch (error) {
@@ -8,15 +11,15 @@ export const getAllUsers = async ()=> {
     }
 };
 
-export const getUserByEmail = async (email: any) => {
+async getUserByEmail(email: string): Promise<IUser | null> {
     try {
-   return await User.findOne({email});
+   return await User.findOne({ email });
     } catch (error) {
         throw new Error("Error fetching user by email " + error.message); 
     }
 };
 
-export const getUserById = async (id: any) => {
+async getUserById(id: Types.ObjectId): Promise<IUser | null> {
     try {
     return await User.findById(id);
     } catch (error) {
@@ -24,7 +27,7 @@ export const getUserById = async (id: any) => {
     }
 };
 
-export const saveUser = async (name: any, email: any, hashedPassword: any) => {
+async saveUser(name: string, email: string, hashedPassword: string): Promise<IUser | null > {
     try {
         const userToSave = new User({ name, email, hashedPassword });
         return await userToSave.save();
@@ -32,3 +35,4 @@ export const saveUser = async (name: any, email: any, hashedPassword: any) => {
         throw new Error("Error saving user: " + error.message);
     };
 };
+}
