@@ -3,7 +3,7 @@ import { createToken } from "../utils/token-manager.js";
 import { COOKIE_NAME } from "../utils/constants.js";
 import { UserService } from "../services/user-services.js";
 import { AuthenticationService } from "../services/authentication-services.js";
-import { errorMiddleware } from '../utils/errorMiddleware.js';
+import { errorMiddleware } from '../utils/middleware.js';
 
 const userService = new UserService();
 const authenticationService = new AuthenticationService();

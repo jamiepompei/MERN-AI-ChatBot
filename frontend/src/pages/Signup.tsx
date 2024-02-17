@@ -5,7 +5,6 @@ import { IoIosLogIn } from "react-icons/io";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from 'react-router-dom';
-import { AxiosError } from "axios";
 
 
 const Signup = () => {
@@ -23,9 +22,9 @@ const Signup = () => {
             toast.success("Signed up successfully!", { id: "signup" });
             navigate("/login");
         } catch (error: unknown) {
-            if (error instanceof AxiosError) {
+            if (error instanceof Error) {
             console.log(error);
-            toast.error("Sign up failed. " + error.response?.data?.toString(), { id: "signup" });
+            toast.error("Sign up failed. " + error.message?.toString(), { id: "signup" });
             }
         }
     }

@@ -2,18 +2,17 @@ import { NextFunction, Response, Request } from "express";
 import { UserService } from "../services/user-services.js";
 import { AuthenticationService } from "../services/authentication-services.js";
 import { ChatService } from "../services/chat-services.js";
-import { errorMiddleware } from "../utils/errorMiddleware.js";
+import { errorMiddleware } from "../utils/middleware.js";
 
 const chatService = new ChatService();
 const userService = new UserService();
 const authService = new AuthenticationService();
 
 export const generateChatCompletionController = async (req: Request, res: Response, next: NextFunction) => {
-    const { message } = req.body;
+    const message  = req.body;
    try {
-    console.log("received the following message to reply to {message} ", message);
     const userId = res.locals.jwtData.id;
-    const chats = await chatService.generateChatCompletion(userId, message);
+    const chats = await chatService.generateChatCompletion(userId, message.getReader.toString());
     return res.status(200).json({ chats });
    } catch (error) {
     return next(error);
