@@ -1,22 +1,22 @@
 import { NextFunction, Response, Request } from "express";
-import { getAllUsers, getUserByEmail, saveUser, getUserById } from "../services/user-services.js";
-import { verifyPassword, verifyUserByEmail, hashPassword, verifyUserByTokenId, verifyTokenId } from "../services/authentication-services.js";
 import { createToken } from "../utils/token-manager.js";
 import { COOKIE_NAME } from "../utils/constants.js";
+import { UserService } from "../services/user-services.js";
+import { AuthenticationService } from "../services/authentication-services.js";
+import { errorMiddleware } from '../utils/middleware.js';
 
+const userService = new UserService();
+const authenticationService = new AuthenticationService();
 
 export const getAllUsersController = async (
     req: Request, 
     res: Response, 
     next: NextFunction) => {
     try {
-        const users = getAllUsers();
+        const users = await userService.getAllUsers();
         return res.status(200).json({ message: "OK", users});
     } catch (error){ 
-        console.log(error);
-        return res.status(200).json({
-            message: "ERROR", 
-            cause: error.message})
+        return next(error);
     }
 };
 
@@ -26,10 +26,10 @@ export const userLoginController = async (
     next: NextFunction) => {
     try {
         const { email, password } = req.body;
-        const user = await getUserByEmail(email);
+        const user = await userService.getUserByEmail(email);
         console.log("User " + user);
-        verifyUserByEmail(user, true);
-        await verifyPassword(password, user.password);
+        authenticationService.verifyUserByEmail(user, true);
+        await authenticationService.verifyPassword(password, user.password);
         
         res.clearCookie(COOKIE_NAME, {
             httpOnly: true,
@@ -50,20 +50,8 @@ export const userLoginController = async (
              signed: true,
         });
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
-    } catch (error){ 
-        console.log(error);
-        if (error.cause === 401) {
-            return res.status(401).json({
-                message: "User is not registered. Sign up and then try logging in.",
-                cause: error.message
-            });
-        } else if (error.cause === 403) {
-            return res.status(403).json({
-                message: "Incorrect password.",
-                cause: error.message
-            });
-        }
-        return res.status(200).json({ message: "ERROR", cause: error.message });
+    } catch (error) { 
+        return next(error);
     }
 };
 
@@ -73,10 +61,10 @@ export const userSignupController = async (
     next: NextFunction) => {
     try {
         const { name, email, password } = req.body;
-        const user = await getUserByEmail(email);
-        verifyUserByEmail(user, false);
-        const hashedPassword = await hashPassword(password);
-        const userToSave = await saveUser(name, email, hashedPassword);
+        const user = await userService.getUserByEmail(email);
+        authenticationService.verifyUserByEmail(user, false);
+        const hashedPassword = await authenticationService.hashPassword(password);
+        const userToSave = await userService.saveUser(name, email, hashedPassword);
         res.clearCookie(COOKIE_NAME, {
             httpOnly: true,
             domain: "localhost",
@@ -95,24 +83,15 @@ export const userSignupController = async (
         });
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error) { 
-        console.log(error);
-        if (error.cause === 401) {
-            return res.status(401).json({
-                message: "User is already registered. Navigate to the login page and login.",
-                cause: error.message
-            });
-        }
-        return res.status(200).json({
-            message: "ERROR", 
-            cause: error.message});
+        return next(error);
     }
 };
 
 export const userLogoutController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await getUserById(res.locals.jwtData.id);
-        verifyUserByTokenId(user);
-        verifyTokenId(user._id.toString(), res.locals.jwtData.id);
+        const user = await userService.getUserById(res.locals.jwtData.id);
+        authenticationService.verifyUserByTokenId(user);
+        authenticationService.verifyTokenId(user._id.toString(), res.locals.jwtData.id.toString());
         res.clearCookie(COOKIE_NAME, {
             httpOnly: true,
             domain: "localhost",
@@ -121,45 +100,18 @@ export const userLogoutController = async (req: Request, res: Response, next: Ne
         });
         return res.status(200).json({ message: "OK"});
     } catch (error) {
-        console.log(error);
-        if (error.cause === 401) {
-            return res.status(401).json({
-                message: "Authentication error validating user. Navigate to the login page and login again.",
-                cause: error.message
-            });
-        } else if (error.cause === 403) {
-            return res.status(403).json({
-                message: "Authentication error validating token. Navigate to the login page and login again.",
-                cause: error.message
-            });
-        }
-        return res.status(200).json({
-            message: "ERROR", 
-            cause: error.message});
+        return next(error);
     }
 };
 
 export const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await getUserById(res.locals.jwtData.id);
-        verifyUserByTokenId(user);
-        verifyTokenId(user._id.toString(), res.locals.jwtData.id);
+        const user = await userService.getUserById(res.locals.jwtData.id);
+        authenticationService.verifyUserByTokenId(user);
+        authenticationService.verifyTokenId(user._id.toString(), res.locals.jwtData.id.toString());
         return res.status(200).json({ message: "OK", name: user.name, email: user.email });
     } catch (error) {
-        console.log(error);
-        if (error.cause === 401) {
-            return res.status(401).json({
-                message: "Authentication error validating user. Navigate to the login page and login again.",
-                cause: error.message
-            });
-        } else if (error.cause === 403) {
-            return res.status(403).json({
-                message: "Authentication error validating token. Navigate to the login page and login again.",
-                cause: error.message
-            });
-        }
-        return res.status(200).json({
-            message: "ERROR", 
-            cause: error.message});
+        return next(error);
     };
 }
+export default errorMiddleware;
