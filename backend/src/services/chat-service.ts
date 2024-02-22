@@ -1,7 +1,7 @@
 import { ChatCompletionRequestMessage, OpenAIApi } from "openai";
 import { AuthenticationService } from "./authentication-service.js";
 import { configureOpenAI } from "../config/openai-config.js";
-import { IUser} from "../models/user.js";
+import { UserDTO } from "../models/user.js";
 import { Types } from "mongoose";
 import { UserService } from "./user-service.js";
 
@@ -13,7 +13,7 @@ export class ChatService {
 
     async generateChatCompletion(userId: Types.ObjectId, message: string): Promise<string[]> {
         try {
-            const user: IUser = await userService.getUserById(userId);
+            const user: UserDTO = await userService.getUserById(userId);
             console.log("user {user}", user);
             authService.verifyUserByTokenId(user);
             const chats =  this.getUserChats(user, message);
@@ -35,7 +35,7 @@ export class ChatService {
         }
     };
 
-    private getUserChats(user: IUser, message: string): ChatCompletionRequestMessage[] {
+    private getUserChats(user: UserDTO, message: string): ChatCompletionRequestMessage[] {
         const chats = user.chats.map(({ role, content }) => ({ role, content })) as ChatCompletionRequestMessage[];
         chats.push({ content: message, role: "user" });
         user.chats.push({
