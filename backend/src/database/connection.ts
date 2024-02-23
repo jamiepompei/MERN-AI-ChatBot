@@ -5,9 +5,9 @@ async function connectToDatabase() {
         await connect(process.env.MONGODB_URL);
     } catch (error) {
         console.log(error);
-        throw new Error("Cannot Connect to MongoDB")
+        throw new Error("Cannot Connect to MongoDB");
     }
-}
+};
 
 async function disconnectFromDatabase() {
     try {
@@ -16,7 +16,7 @@ async function disconnectFromDatabase() {
         console.log(error);
         throw new Error("Could not Disconnect from MongoDB");
     }
-}
+};
 
-export {connectToDatabase, disconnectFromDatabase}
+export {connectToDatabase, disconnectFromDatabase};
 
