@@ -1,7 +1,7 @@
 import { ChatCompletionRequestMessage, OpenAIApi } from "openai";
 import { AuthenticationService } from "./authentication-service.js";
 import { configureOpenAI } from "../config/openai-config.js";
-import { UserDTO } from "../models/user.js";
+import { UserDTO, ChatDTO } from "../models/user.js";
 import { Types } from "mongoose";
 import { UserService } from "./user-service.js";
 
@@ -14,7 +14,6 @@ export class ChatService {
     async generateChatCompletion(userId: Types.ObjectId, message: string): Promise<string[]> {
         try {
             const user: UserDTO = await userService.getUserById(userId);
-            console.log("user {user}", user);
             authService.verifyUserByTokenId(user);
             const chats =  this.getUserChats(user, message);
             const config = configureOpenAI();
@@ -22,11 +21,11 @@ export class ChatService {
 
             // @ts-ignore
             // remove this once api key can be accessed
-            user.chats.push({ id: "helloid", role: "assistant", content: "hello, testing...testing..." });
+            // user.chats.push({ id: "helloid", role: "assistant", content: "hello, testing...testing..." });
 
-            // const chatResponse = await openAI.createChatCompletion({ model: "gpt-3.-turbo", messages: chats });
-            // user.chats.push(chatResponse.data.choices[0].message);
-
+            const chatResponse = await openAI.createChatCompletion({ model: "gpt-3.-turbo", messages: chats });
+            const chat: ChatDTO = { role: "assistant", content: chatResponse.data.choices[0].message.content };
+            user.chats.push(chat);
             await userService.saveUser(user.name, user.email, user.password);
             return user.chats.map(chat => chat.content);
         } catch (error) {

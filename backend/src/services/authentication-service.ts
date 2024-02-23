@@ -9,13 +9,13 @@ export class AuthenticationService {
                 const error = new Error("User is not registered.");
                 error.cause = 401;
                 throw error;
-        };
+            };
         } else  {
             if (user) {
                 const error = new Error("User is already registered.");
                 error.cause = 409;
                 throw error;
-                };
+            };
         }
     };
 
@@ -25,7 +25,7 @@ export class AuthenticationService {
             error.cause = 401;
             throw error;
         }
-    }
+    };
 
     async verifyPassword(passwordToVerify: string, existingPassword: string): Promise<void> {
         if (!(await compare(passwordToVerify, existingPassword))) {

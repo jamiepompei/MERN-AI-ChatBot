@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface Chat {
+export interface ChatDTO {
     id?: string;
     role: string;
     content: string;
@@ -11,7 +11,7 @@ export interface UserDTO extends Document {
     name: string;
     email: string;
     password: string;
-    chats: Chat[];
+    chats: ChatDTO[];
 }
 
 const chatSchema = new mongoose.Schema({
@@ -27,7 +27,7 @@ const chatSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-})
+});
 
 const userSchema = new mongoose.Schema({
     name: {
