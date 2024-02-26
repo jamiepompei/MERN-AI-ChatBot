@@ -31,8 +31,12 @@ const Chat = () => {
         if (content) {
         const newMessage: Message = { role: "user", content };
         setChatMessages((prev)=> [...prev, newMessage]);
-        const chatData = await sendChatRequest(content);
-        setChatMessages(chatData?.chats ? [...chatData.chats] : []);
+        try {
+         const chatData = await sendChatRequest(content);
+          setChatMessages(chatData?.chats ? [...chatData.chats] : []);
+        } catch (error){
+           toast.error("An error occurred while generating chat completion. Error: " + error);
+        }
     }
   }
 
@@ -50,7 +54,7 @@ const Chat = () => {
         setChatMessages([]);
         toast.success("Successfully deleted chats!", { id: "deleteChats" });
       } catch (error){
-        console.log(error);
+        console.error(error);
         toast.error("Failed to delete chats.", { id: "deletedChats" });
       }
     };
