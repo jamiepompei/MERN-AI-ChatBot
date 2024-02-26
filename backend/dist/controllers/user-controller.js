@@ -1,5 +1,5 @@
 import { createToken } from "../utils/token-manager.js";
-import { COOKIE_NAME } from "../utils/constants.js";
+import { COOKIE_NAME, TOKEN_EXPIRATION } from "../utils/constants.js";
 import { UserService } from "../services/user-service.js";
 import { AuthenticationService } from "../services/authentication-service.js";
 import { errorMiddleware } from '../utils/error-middleware.js';
@@ -18,7 +18,6 @@ export const userLoginController = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const user = await userService.getUserByEmail(email);
-        console.log("User " + user);
         authenticationService.verifyUserByEmail(user, true);
         await authenticationService.verifyPassword(password, user.password);
         res.clearCookie(COOKIE_NAME, {
@@ -27,8 +26,7 @@ export const userLoginController = async (req, res, next) => {
             signed: true,
             path: "/",
         });
-        const token = createToken(user._id.toString(), user.email, "7d");
-        console.log("token " + token);
+        const token = createToken(user._id.toString(), user.email, TOKEN_EXPIRATION);
         const expires = new Date();
         expires.setDate(expires.getDate() + 7);
         res.cookie(COOKIE_NAME, token, {
@@ -57,7 +55,7 @@ export const userSignupController = async (req, res, next) => {
             signed: true,
             path: "/",
         });
-        const token = createToken(userToSave._id.toString(), userToSave.email, "7d");
+        const token = createToken(userToSave._id.toString(), userToSave.email, TOKEN_EXPIRATION);
         const expires = new Date();
         expires.setDate(expires.getDate() + 7);
         res.cookie(COOKIE_NAME, token, {
