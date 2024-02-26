@@ -6,7 +6,7 @@ import { coldarkCold } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { formatNameToInitials } from '../shared/InitialFormatter';
 
 function extractCodeFromString(message: string) {
-    if (message.includes("```")){
+    if (typeof message === 'string' && message.includes("```")){
         const blocks = message.split("```");
         return blocks;
     }
@@ -34,7 +34,7 @@ const ChatItem = ({
         content: string, 
         role: "user" | "assistant";
     }) => {
-        const messageBlocks = extractCodeFromString(content);   
+        const messageBlocks =  extractCodeFromString(content);   
         const auth = useAuth();
         return role === "assistant" ? (
         <Box sx={{ display: "flex", p: 2, bgcolor: "transparent", my: 1, gap: 2 }}>

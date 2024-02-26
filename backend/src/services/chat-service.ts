@@ -13,24 +13,29 @@ export class ChatService {
 
     async generateChatCompletion(userId: Types.ObjectId, message: string): Promise<string[]> {
         try {
+            console.log("Is message a string? " + message);
             const user: UserDTO = await userService.getUserById(userId);
             authService.verifyUserByTokenId(user);
-            const chats =  this.getUserChats(user, message);
+           // const chats =  this.getUserChats(user, message);
+
+           const chats = user.chats.map(({ role, content }) => ({ role, content })) as ChatCompletionRequestMessage[];
+           chats.push({ content: message, role: "user" });
+           user.chats.push({
+               content: message, role: "user",
+               id: ""
+           });
+
             const config = configureOpenAI();
             const openAI = new OpenAIApi(config);
 
-            // @ts-ignore
-            // remove this once api key can be accessed
-            // user.chats.push({ id: "helloid", role: "assistant", content: "hello, testing...testing..." });
-
-            const chatResponse = await openAI.createChatCompletion({ model: "gpt-3.-turbo", messages: chats });
+            const chatResponse = await openAI.createChatCompletion({ model: "gpt-3.5-turbo", messages: chats });
             const chat: ChatDTO = { role: "assistant", content: chatResponse.data.choices[0].message.content };
             user.chats.push(chat);
-            await userService.saveUser(user.name, user.email, user.password);
+            await userService.updateUserChats(user);
             return user.chats.map(chat => chat.content);
         } catch (error) {
             console.log(error);
-            throw new Error("Error generating chat completion");
+            throw new Error("Error generating chat completion. Error: " + error);
         }
     };
 

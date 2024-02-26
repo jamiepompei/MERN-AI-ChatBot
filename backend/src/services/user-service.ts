@@ -27,9 +27,19 @@ export class UserService {
         }
     };
 
+    async updateUserChats(user: UserDTO): Promise<UserDTO | null> { 
+        try{
+            console.log("chats to update: " + user.chats);
+            return await User.findByIdAndUpdate(user._id, { chats: user.chats });
+        } catch (error) {
+            throw new Error("Error updating user chats: " + error.message);
+        }
+    }
+
     async saveUser(name: string, email: string, hashedPassword: string): Promise<UserDTO | null > {
         try {
-            const userToSave = new User({ name, email, hashedPassword });
+            const userToSave = new User({ name, email, password: hashedPassword });
+            console.log("user to save " + userToSave);
             return await userToSave.save();
         } catch (error) {
             throw new Error("Error saving user: " + error.message);

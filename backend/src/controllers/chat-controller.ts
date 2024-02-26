@@ -9,10 +9,11 @@ const userService = new UserService();
 const authService = new AuthenticationService();
 
 export const generateChatCompletionController = async (req: Request, res: Response, next: NextFunction) => {
-    const message  = req.body;
    try {
+    const message = req.body.message;
+    console.log(message);
     const userId = res.locals.jwtData.id;
-    const chats = await chatService.generateChatCompletion(userId, message.getReader.toString());
+    const chats = await chatService.generateChatCompletion(userId, message);
     return res.status(200).json({ chats });
    } catch (error) {
     return next(error);
