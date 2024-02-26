@@ -43,12 +43,12 @@ const ChatItem = ({
             </Avatar>
             <Box>
                 {!messageBlocks && (<Typography sx={{ fontSize: "20px" }}>{ content }</Typography>)}
-                {messageBlocks && messageBlocks.length && messageBlocks.map((block) => isCodeBlock(block) ? 
-                    <SyntaxHighlighter style={coldarkCold} language="javascript">
+                {messageBlocks && messageBlocks.length && messageBlocks.map((block, index) => isCodeBlock(block) ? 
+                    <SyntaxHighlighter key={index} style={coldarkCold} language="javascript">
                         {block}
                     </SyntaxHighlighter> 
                     : 
-                    <Typography sx={{ fontSize: "20px" }}>{ block }</Typography> )}
+                    <Typography key={index} sx={{ fontSize: "20px" }}>{ block }</Typography> )}
             </Box>
         </Box>
         ) : ( 

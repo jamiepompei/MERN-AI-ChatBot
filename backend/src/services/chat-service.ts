@@ -13,17 +13,15 @@ export class ChatService {
 
     async generateChatCompletion(userId: Types.ObjectId, message: string): Promise<string[]> {
         try {
-            console.log("Is message a string? " + message);
             const user: UserDTO = await userService.getUserById(userId);
             authService.verifyUserByTokenId(user);
-           // const chats =  this.getUserChats(user, message);
 
-           const chats = user.chats.map(({ role, content }) => ({ role, content })) as ChatCompletionRequestMessage[];
-           chats.push({ content: message, role: "user" });
-           user.chats.push({
+            const chats = user.chats.map(({ role, content }) => ({ role, content })) as ChatCompletionRequestMessage[];
+            chats.push({ content: message, role: "user" });
+            user.chats.push({
                content: message, role: "user",
                id: ""
-           });
+            });
 
             const config = configureOpenAI();
             const openAI = new OpenAIApi(config);
@@ -34,18 +32,8 @@ export class ChatService {
             await userService.updateUserChats(user);
             return user.chats.map(chat => chat.content);
         } catch (error) {
-            console.log(error);
+            console.error(error);
             throw new Error("Error generating chat completion. Error: " + error);
         }
-    };
-
-    private getUserChats(user: UserDTO, message: string): ChatCompletionRequestMessage[] {
-        const chats = user.chats.map(({ role, content }) => ({ role, content })) as ChatCompletionRequestMessage[];
-        chats.push({ content: message, role: "user" });
-        user.chats.push({
-            content: message, role: "user",
-            id: ""
-        });
-        return chats;
     };
 }

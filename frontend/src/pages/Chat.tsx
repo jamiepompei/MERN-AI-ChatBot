@@ -54,7 +54,7 @@ const Chat = () => {
         setChatMessages([]);
         toast.success("Successfully deleted chats!", { id: "deleteChats" });
       } catch (error){
-        console.log(error);
+        console.error(error);
         toast.error("Failed to delete chats.", { id: "deletedChats" });
       }
     };
