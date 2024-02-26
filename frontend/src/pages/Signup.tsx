@@ -30,7 +30,7 @@ const Signup = () => {
             navigate("/login");
         } catch (error: unknown) {
             if (error instanceof Error) {
-            console.log(error);
+            console.error(error);
             toast.error("Sign up failed. " + error.message?.toString(), { id: "signup" });
             }
         }
