@@ -27,9 +27,17 @@ export class UserService {
         }
     }
     ;
+    async updateUserChats(user) {
+        try {
+            return await User.findByIdAndUpdate(user._id, { chats: user.chats });
+        }
+        catch (error) {
+            throw new Error("Error updating user chats: " + error.message);
+        }
+    }
     async saveUser(name, email, hashedPassword) {
         try {
-            const userToSave = new User({ name, email, hashedPassword });
+            const userToSave = new User({ name, email, password: hashedPassword });
             return await userToSave.save();
         }
         catch (error) {
