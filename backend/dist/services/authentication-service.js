@@ -26,6 +26,7 @@ export class AuthenticationService {
             throw error;
         }
     }
+    ;
     async verifyPassword(passwordToVerify, existingPassword) {
         if (!(await compare(passwordToVerify, existingPassword))) {
             const error = new Error("Incorrect password.");
