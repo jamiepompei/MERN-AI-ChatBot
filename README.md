@@ -12,3 +12,4 @@ Technologies: MERN Stack, OpenAI, JWT Tokens, HTTP-Only Cookies, Signed Cookies,
 - Chat display is capable of showing code blocks<br>
 <br>
 To run this project locally, clone down the repo. CD into backend folder and run 'npm run dev' to run the server. CD into frontend folder and run 'npm run dev' to run the frontend. 
+
