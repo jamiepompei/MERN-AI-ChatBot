@@ -3,6 +3,7 @@ import { UserService } from "../services/user-service.js";
 import { AuthenticationService } from "../services/authentication-service.js";
 import { ChatService } from "../services/chat-service.js";
 import { errorMiddleware } from "../utils/error-middleware.js";
+import { Types } from "mongoose";
 
 const chatService = new ChatService();
 const userService = new UserService();
@@ -10,8 +11,8 @@ const authService = new AuthenticationService();
 
 export const generateChatCompletionController = async (req: Request, res: Response, next: NextFunction) => {
    try {
-    const message = req.body.message;
-    const userId = res.locals.jwtData.id;
+    const message = req.body.message as string;
+    const userId = res.locals.jwtData.id as Types.ObjectId;
     const chats = await chatService.generateChatCompletion(userId, message);
     return res.status(200).json({ chats });
    } catch (error) {

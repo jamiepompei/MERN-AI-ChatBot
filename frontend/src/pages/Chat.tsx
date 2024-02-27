@@ -29,16 +29,16 @@ const Chat = () => {
             inputRef.current.value = "";
         }
         if (content) {
-        const newMessage: Message = { role: "user", content };
-        setChatMessages((prev)=> [...prev, newMessage]);
-        try {
-         const chatData = await sendChatRequest(content);
-          setChatMessages(chatData?.chats ? [...chatData.chats] : []);
-        } catch (error){
-           toast.error("An error occurred while generating chat completion. Error: " + error);
+          const newMessage: Message = { role: "user", content };
+          setChatMessages((prev)=> [...prev, newMessage]);
+          try {
+            const chatData = await sendChatRequest(content);
+            setChatMessages(chatData?.chats ? [...chatData.chats] : []);
+          } catch (error){
+            toast.error("An error occurred while generating chat completion. Error: " + error);
+          }
         }
     }
-  }
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       const content = inputRef.current?.value as string;
