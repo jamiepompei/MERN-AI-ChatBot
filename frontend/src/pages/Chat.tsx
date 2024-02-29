@@ -43,7 +43,7 @@ const Chat = () => {
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       const content = inputRef.current?.value as string;
       if (content && event.key === 'Enter') {
-        handleSubmit();
+          handleSubmit();
       }
     }
 

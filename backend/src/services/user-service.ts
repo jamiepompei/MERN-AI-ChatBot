@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import User, { UserDTO } from "../models/user.js";
+import User, { UserDTO } from "../models/User.js";
 
 export class UserService {
 

@@ -13,7 +13,6 @@ export class ChatService {
             chats.push({ content: message, role: "user" });
             user.chats.push({
                 content: message, role: "user",
-                id: ""
             });
             const config = configureOpenAI();
             const openAI = new OpenAIApi(config);
@@ -21,7 +20,7 @@ export class ChatService {
             const chat = { role: "assistant", content: chatResponse.data.choices[0].message.content };
             user.chats.push(chat);
             await userService.updateUserChats(user);
-            return user.chats.map(chat => chat.content);
+            return user.chats;
         }
         catch (error) {
             console.error(error);
