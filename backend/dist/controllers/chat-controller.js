@@ -7,9 +7,9 @@ const userService = new UserService();
 const authService = new AuthenticationService();
 export const generateChatCompletionController = async (req, res, next) => {
     try {
-        const message = req.body.message;
-        const userId = res.locals.jwtData.id;
-        const chats = await chatService.generateChatCompletion(userId, message);
+        const { message } = req.body;
+        const { id } = res.locals.jwtData;
+        const chats = await chatService.generateChatCompletion(id, message);
         return res.status(200).json({ chats });
     }
     catch (error) {
@@ -33,7 +33,7 @@ export const deleteChats = async (req, res, next) => {
         authService.verifyUserByTokenId(user);
         authService.verifyTokenId(user._id.toString(), res.locals.jwtData.id.toString());
         user.chats = [];
-        await userService.saveUser(user.name, user.email, user.password);
+        await userService.updateUserChats(user);
         return res.status(200).json({ message: "OK" });
     }
     catch (error) {

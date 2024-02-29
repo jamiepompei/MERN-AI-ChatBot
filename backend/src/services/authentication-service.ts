@@ -1,5 +1,5 @@
 import { compare, hash } from 'bcrypt';
-import { UserDTO } from '../models/user.js';
+import { UserDTO } from '../models/User.js';
 
 export class AuthenticationService {
 

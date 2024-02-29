@@ -6,7 +6,7 @@ import { coldarkCold } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { formatNameToInitials } from '../shared/InitialFormatter';
 
 function extractCodeFromString(message: string) {
-    if (typeof message === 'string' && message.includes("```")){
+    if (message.includes("```")){
         const blocks = message.split("```");
         return blocks;
     }
@@ -34,7 +34,7 @@ const ChatItem = ({
         content: string, 
         role: "user" | "assistant";
     }) => {
-        const messageBlocks =  extractCodeFromString(content);   
+        const messageBlocks =  extractCodeFromString(content); 
         const auth = useAuth();
         return role === "assistant" ? (
         <Box sx={{ display: "flex", p: 2, bgcolor: "transparent", my: 1, gap: 2 }}>
@@ -42,13 +42,13 @@ const ChatItem = ({
             <img src="openai.png" alt="openai" width={"30px"} />
             </Avatar>
             <Box>
-                {!messageBlocks && (<Typography sx={{ fontSize: "20px" }}>{ content }</Typography>)}
-                {messageBlocks && messageBlocks.length && messageBlocks.map((block, index) => isCodeBlock(block) ? 
-                    <SyntaxHighlighter key={index} style={coldarkCold} language="javascript">
+                {!messageBlocks && (<Typography sx={{ fontSize: "20px" }}>{ content }</Typography>)} 
+                {messageBlocks && messageBlocks.length && messageBlocks.map((block) => isCodeBlock(block) ? 
+                    <SyntaxHighlighter style={coldarkCold} language="javascript">
                         {block}
                     </SyntaxHighlighter> 
                     : 
-                    <Typography key={index} sx={{ fontSize: "20px" }}>{ block }</Typography> )}
+                    <Typography sx={{ fontSize: "20px" }}>{ block }</Typography> )}
             </Box>
         </Box>
         ) : ( 
