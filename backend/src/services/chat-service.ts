@@ -1,6 +1,6 @@
 import { ChatCompletionRequestMessage, OpenAIApi } from "openai";
 import { AuthenticationService } from "./authentication-service.js";
-import { configureOpenAI, getOpenAIAPIInstance } from "../config/openai-config.js";
+import { getOpenAIAPIInstance } from "../config/openai-config.js";
 import { UserDTO, ChatDTO } from "../models/User.js";
 import { Types } from "mongoose";
 import { UserService } from "./user-service.js";
@@ -16,15 +16,19 @@ export class ChatService {
         try {
             const user: UserDTO = await userService.getUserById(userId);
             authService.verifyUserByTokenId(user);
-            const chats = user.chats.map(({ role, content }) => ({ role, content })) as ChatCompletionRequestMessage[];
-            chats.push({ content: message, role: USER_ROLE });
+            // map user chats to API request format
+            const openAiApiChatRequest = user.chats.map(({ role, content }) => ({ role, content })) as ChatCompletionRequestMessage[];
+            openAiApiChatRequest.push({ content: message, role: USER_ROLE });
+            // update user chats with user inputted chats
             user.chats.push({
                content: message, role: USER_ROLE,
             });
-
-            const chatResponse = await getOpenAIAPIInstance().createChatCompletion({ model: GPT_MODEL, messages: chats });
-            const chat: ChatDTO = { role: ASSISTANT_ROLE, content: chatResponse.data.choices[0].message.content };
-            user.chats.push(chat);
+            const openAIChatResponseObj = await getOpenAIAPIInstance().createChatCompletion({ model: GPT_MODEL, messages: openAiApiChatRequest });
+            // format API response to ChatDTO
+            const apiChatObj: ChatDTO = { role: ASSISTANT_ROLE, content: openAIChatResponseObj.data.choices[0].message.content };
+            // add API response object to user.chats
+            user.chats.push(apiChatObj);
+            // update the user
             await userService.updateUserChats(user);
             return user.chats;
         } catch (error) {
