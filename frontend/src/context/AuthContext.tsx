@@ -29,11 +29,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 }
             } catch (error: unknown) {
                 // TODO currently, an error is thrown when a user is not logged in and accesses signup, home, or logout pages.
-                //for now, we are catching authentication status check errors, logging the response, and always setting the user
-                // null and isLoggedIn false
+                //for now, we are catching authentication status check errors, logging the response, and always setting the user null and isLoggedIn false
                 //finally, update the loading state
                 if (error instanceof Error) {
-                        console.error("An error occurred while checking authentication status:", error.message);
+                        console.error("An error occurred while checking authentication status: ", error.message);
                     }
                 setUser(null);
                 setIsLoggedIn(false);

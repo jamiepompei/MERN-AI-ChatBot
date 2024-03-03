@@ -1,4 +1,4 @@
-import { Configuration } from "openai";
+import { Configuration, OpenAIApi } from "openai";
 
 export const configureOpenAI = (): Configuration => {
     const config = new Configuration({
@@ -6,3 +6,7 @@ export const configureOpenAI = (): Configuration => {
     });
     return config;
 };
+
+export const getOpenAIAPIInstance = (): OpenAIApi => {
+    return new OpenAIApi(configureOpenAI());
+}
