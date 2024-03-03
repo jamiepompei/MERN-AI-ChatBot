@@ -1,41 +1,35 @@
-import { OpenAIApi } from "openai";
-import { AuthenticationService } from "./authentication-services.js";
-import { configureOpenAI } from "../config/openai-config.js";
-import { UserService } from "./user-services.js";
+import { ChatCompletionRequestMessage, OpenAIApi } from "openai";
+import { AuthenticationService } from "./authentication-service.js";
+import { getOpenAIAPIInstance } from "../config/openai-config.js";
+import { UserDTO, ChatDTO } from "../models/User.js";
+import { Types } from "mongoose";
+import { UserService } from "./user-service.js";
+import { ASSISTANT_ROLE, GPT_MODEL, USER_ROLE } from "../utils/constants.js";
+
+
 const userService = new UserService();
 const authService = new AuthenticationService();
+
 export class ChatService {
-    async generateChatCompletion(userId, message) {
+
+    async generateChatCompletion(userId: Types.ObjectId, message: string): Promise<ChatDTO[]> {
         try {
-            const user = await userService.getUserById(userId);
-            console.log("user {user}", user);
+            const user: UserDTO = await userService.getUserById(userId);
             authService.verifyUserByTokenId(user);
-            const chats = this.getUserChats(user, message);
-            const config = configureOpenAI();
-            const openAI = new OpenAIApi(config);
-            // @ts-ignore
-            // remove this once api key can be accessed
-            user.chats.push({ id: "helloid", role: "assistant", content: "hello, testing...testing..." });
-            // const chatResponse = await openAI.createChatCompletion({ model: "gpt-3.-turbo", messages: chats });
-            // user.chats.push(chatResponse.data.choices[0].message);
-            await userService.saveUser(user.name, user.email, user.password);
-            return user.chats.map(chat => chat.content);
+            const chats = user.chats.map(({ role, content }) => ({ role, content })) as ChatCompletionRequestMessage[];
+            chats.push({ content: message, role: USER_ROLE });
+            user.chats.push({
+               content: message, role: USER_ROLE,
+            });
+
+            const chatResponse = await getOpenAIAPIInstance().createChatCompletion({ model: GPT_MODEL, messages: chats });
+            const chat: ChatDTO = { role: ASSISTANT_ROLE, content: chatResponse.data.choices[0].message.content };
+            user.chats.push(chat);
+            await userService.updateUserChats(user);
+            return user.chats;
+        } catch (error) {
+            console.error(error);
+            throw new Error("Error generating chat completion. Error: " + error);
         }
-        catch (error) {
-            console.log(error);
-            throw new Error("Error generating chat completion");
-        }
-    }
-    ;
-    getUserChats(user, message) {
-        const chats = user.chats.map(({ role, content }) => ({ role, content }));
-        chats.push({ content: message, role: "user" });
-        user.chats.push({
-            content: message, role: "user",
-            id: ""
-        });
-        return chats;
-    }
-    ;
+    };
 }
-//# sourceMappingURL=chat-services.js.map

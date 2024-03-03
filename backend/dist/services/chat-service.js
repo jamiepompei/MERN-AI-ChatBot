@@ -1,7 +1,7 @@
-import { OpenAIApi } from "openai";
 import { AuthenticationService } from "./authentication-service.js";
-import { configureOpenAI } from "../config/openai-config.js";
+import { getOpenAIAPIInstance } from "../config/openai-config.js";
 import { UserService } from "./user-service.js";
+import { ASSISTANT_ROLE, GPT_MODEL, USER_ROLE } from "../utils/constants.js";
 const userService = new UserService();
 const authService = new AuthenticationService();
 export class ChatService {
@@ -9,16 +9,19 @@ export class ChatService {
         try {
             const user = await userService.getUserById(userId);
             authService.verifyUserByTokenId(user);
-            const chats = user.chats.map(({ role, content }) => ({ role, content }));
-            chats.push({ content: message, role: "user" });
+            // map user chats to API request format
+            const openAiApiChatRequest = user.chats.map(({ role, content }) => ({ role, content }));
+            openAiApiChatRequest.push({ content: message, role: USER_ROLE });
+            // update user chats with user inputted chats
             user.chats.push({
-                content: message, role: "user",
+                content: message, role: USER_ROLE,
             });
-            const config = configureOpenAI();
-            const openAI = new OpenAIApi(config);
-            const chatResponse = await openAI.createChatCompletion({ model: "gpt-3.5-turbo", messages: chats });
-            const chat = { role: "assistant", content: chatResponse.data.choices[0].message.content };
-            user.chats.push(chat);
+            const openAIChatResponseObj = await getOpenAIAPIInstance().createChatCompletion({ model: GPT_MODEL, messages: openAiApiChatRequest });
+            // format API response to ChatDTO
+            const apiChatObj = { role: ASSISTANT_ROLE, content: openAIChatResponseObj.data.choices[0].message.content };
+            // add API response object to user.chats
+            user.chats.push(apiChatObj);
+            // update the user
             await userService.updateUserChats(user);
             return user.chats;
         }
