@@ -18,7 +18,10 @@ export const userLoginController = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const user = await userService.getUserByEmail(email);
-        authenticationService.verifyUserByEmail(user, true);
+        if (!user) {
+            throw new Error("No User exists!");
+        }
+        await authenticationService.verifyUserByEmail(user, true);
         await authenticationService.verifyPassword(password, user.password);
         res.clearCookie(COOKIE_NAME, {
             httpOnly: true,
@@ -46,7 +49,10 @@ export const userSignupController = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
         const user = await userService.getUserByEmail(email);
-        authenticationService.verifyUserByEmail(user, false);
+        if (user) {
+            throw new Error("User already exists.");
+        }
+        await authenticationService.verifyUserByEmail(user, false);
         const hashedPassword = await authenticationService.hashPassword(password);
         const userToSave = await userService.saveUser(name, email, hashedPassword);
         res.clearCookie(COOKIE_NAME, {

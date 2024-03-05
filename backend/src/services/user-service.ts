@@ -13,8 +13,8 @@ export class UserService {
 
     async getUserByEmail(email: string): Promise<UserDTO | null> {
         try {
-    return await User.findOne({ email });
-        } catch (error) {
+            return await User.findOne({ email });
+    } catch (error) {
             throw new Error("Error fetching user by email " + error.message); 
         }
     };
