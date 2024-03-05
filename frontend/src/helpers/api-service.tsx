@@ -57,6 +57,7 @@ export const logOutUser = async () => {
 export const signupUser = async (name: string, email: string, password: string) => {
     try {
          const res = await axios.post("/user/signup", { name, email, password });
+         console.log("Response " + res);
         if (res.status !== 200) {
             // Handle other status codes appropriately
             throw new Error("Unable to signup. Status code: " + res.status + " Error was: " + res.data.message);
@@ -68,11 +69,20 @@ export const signupUser = async (name: string, email: string, password: string) 
         if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
             if (axiosError.response) {
-                // Server responded with a non-2xx status code
-                if (axiosError.response.status == 500) {
-                    axiosError.message = "User already registered.";
-                }
-                throw new Error("Unable to signup. " + axiosError.message);
+                const errorMessageRegex = /Error:\s(.+?)<br>/;
+                const html: string = axiosError.response.data as string;
+                const matches: RegExpMatchArray | null = html.match(errorMessageRegex);
+            
+                let errorMessage = "";
+                if (matches && matches.length >= 2) {
+                    errorMessage = matches[1];
+                    console.log(errorMessage);
+                  } else {
+                    errorMessage = "Error occurred";
+                    console.log(errorMessage);
+                  }
+                  throw new Error(errorMessage)
+
             } else if (axiosError.request) {
                 // No response received (e.g., network error)
                 throw new Error("Unable to connect to server. Please check your internet connection.");

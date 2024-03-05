@@ -62,7 +62,9 @@ export const userSignupController = async (
         const { name, email, password } = req.body;
         const user = await userService.getUserByEmail(email);
         if (user) {
-            throw new Error("User already exists.");
+            const error = new Error("User already Exists.");
+            error.cause = 409;
+            throw error;
         }
         await authenticationService.verifyUserByEmail(user, false);
         const hashedPassword = await authenticationService.hashPassword(password);
