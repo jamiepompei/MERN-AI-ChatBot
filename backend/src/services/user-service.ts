@@ -5,7 +5,7 @@ export class UserService {
 
     async getAllUsers(): Promise<UserDTO[] | null> {
         try {
-        return await User.find();
+            return await User.find();
         } catch (error) {
             throw new Error("Error fetching users " + error.message);
         }
@@ -14,14 +14,14 @@ export class UserService {
     async getUserByEmail(email: string): Promise<UserDTO | null> {
         try {
             return await User.findOne({ email });
-    } catch (error) {
+        } catch (error) {
             throw new Error("Error fetching user by email " + error.message); 
         }
     };
 
     async getUserById(id: Types.ObjectId): Promise<UserDTO | null> {
         try {
-        return await User.findById(id);
+            return await User.findById(id);
         } catch (error) {
             throw new Error("Error fetching user by id " + error.message);
         }
