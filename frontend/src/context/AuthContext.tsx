@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
-import { ApiService } from '../helpers/api-service';
+import { ApiService } from '../service/api-service';
 
 
 type User = {
