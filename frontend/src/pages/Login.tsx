@@ -19,7 +19,7 @@ const Login = () => {
             toast.loading("Singing in...", { id: "login" });
             await auth?.login(email, password);
             toast.success("Signed in successfully!", { id: "login" })
-        } catch (error: unknown) {
+        } catch (error) {
             if (error instanceof Error) {
             console.error(error);
             toast.error("Sign in failed. " + error.message?.toString() , { id: "login" });

@@ -30,8 +30,12 @@ const Signup = () => {
             navigate("/login");
         } catch (error: unknown) {
             if (error instanceof Error) {
-            console.error(error);
-            toast.error("Sign up failed. " + error.message?.toString(), { id: "signup" });
+                console.error(error);
+                const errorMessage = error.message ? error.message.toString() : "An unknown error occurred during sign up.";
+                toast.error("Sign up failed. " + errorMessage, { id: "signup" });
+            } else {
+                console.error("An unknown error occurred during sign up:", error);
+                toast.error("Sign up failed. An unknown error occurred.", { id: "signup" });
             }
         }
     }

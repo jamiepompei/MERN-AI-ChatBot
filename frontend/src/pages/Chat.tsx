@@ -5,7 +5,7 @@ import { IoMdSend } from "react-icons/io"
 import { red } from "@mui/material/colors"
 import { useAuth } from '../context/AuthContext';
 import  ChatItem  from "../components/chat/ChatItem";
-import { sendChatRequest, getUserChats, deleteUserChats } from '../helpers/api-service';
+import { sendChatRequest, getUserChats, deleteUserChats } from '../service/api-service';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { formatNameToInitials } from '../components/shared/InitialFormatter';

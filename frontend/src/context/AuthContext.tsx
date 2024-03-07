@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
-import { loginUser, checkAuthStatus, logOutUser, signupUser } from '../helpers/api-service';
+import { ApiService } from '../service/api-service';
+
 
 type User = {
     name: string, 
@@ -12,6 +13,7 @@ type UserAuth = {
     signup: (name: string, email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
 }
+const apiService = new ApiService();
 const AuthContext = createContext<UserAuth | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User|null>(null);
@@ -19,18 +21,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // fetch if the user's cookies are valid
+        // check if the user's cookies are valid
         async function checkStatus() {
             try {
-                const data = await checkAuthStatus();
+                const data = await apiService.checkAuthStatus();
                 if (data) {
                     setUser({ email: data.email, name: data.name });
                     setIsLoggedIn(true);
                 }
             } catch (error: unknown) {
-                // TODO currently, an error is thrown when a user is not logged in and accesses signup, home, or logout pages.
-                //for now, we are catching authentication status check errors, logging the response, and always setting the user null and isLoggedIn false
-                //finally, update the loading state
                 if (error instanceof Error) {
                         console.error("An error occurred while checking authentication status: ", error.message);
                     }
@@ -42,22 +41,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
         checkStatus();
     }, []);
+    
     const login = async (email: string, password: string) => {
-        const data = await loginUser(email, password);
+        const data = await apiService.loginUser(email, password);
         if (data) {
             setUser({ email: data.email, name: data.name})
             setIsLoggedIn(true);
         }
     };
     const signup = async (name: string, email: string, password: string) => {
-        const data = await signupUser(name, email, password);
+        try {
+        const data = await apiService.signupUser(name, email, password);
         if (data) {
             setUser(null);
             setIsLoggedIn(false);
         }
+    } catch (error: unknown) {
+        setUser(null);
+        setIsLoggedIn(false);
+        throw error;
+    }
     };
     const logout = async () => {
-        await logOutUser();
+        await apiService.logOutUser();
         setIsLoggedIn(false);
         setUser(null);
         window.location.reload();
