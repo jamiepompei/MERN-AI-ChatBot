@@ -1,7 +1,8 @@
 import axios, { AxiosError } from "axios";
+
 export class ErrorService {
 
-    static ERROR_MESSAGE_REGEX = /Error:\s(.+?)<br>/;
+    readonly ERROR_MESSAGE_REGEX: RegExp = /Error:\s(.+?)<br>/;
 
     async handleError(error: unknown) {
         if (axios.isAxiosError(error)) {
