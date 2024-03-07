@@ -18,7 +18,6 @@ const apiService: ApiService = new ApiService();
 
 const Chat = () => {
     const [inputValue, setInputValue] = useState<string>();
-
     const navigate = useNavigate();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const auth = useAuth();
@@ -35,7 +34,7 @@ const Chat = () => {
           try {
             const chatData = await apiService.sendChatRequest(content);
             setChatMessages(chatData?.chats ? [...chatData.chats] : []);
-          } catch (error){
+          } catch (error) {
             toast.error("An error occurred while generating chat completion. Error: " + error);
           }
         }
@@ -54,7 +53,7 @@ const Chat = () => {
         await apiService.deleteUserChats();
         setChatMessages([]);
         toast.success("Successfully deleted chats!", { id: "deleteChats" });
-      } catch (error){
+      } catch (error) {
         console.error(error);
         toast.error("Failed to delete chats.", { id: "deletedChats" });
       }
