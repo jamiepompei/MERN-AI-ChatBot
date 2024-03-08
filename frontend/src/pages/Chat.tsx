@@ -5,7 +5,7 @@ import { IoMdSend } from "react-icons/io"
 import { red } from "@mui/material/colors"
 import { useAuth } from '../context/AuthContext';
 import  ChatItem  from "../components/chat/ChatItem";
-import { sendChatRequest, getUserChats, deleteUserChats } from '../service/api-service';
+import { ApiService } from '../service/api-service';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { formatNameToInitials } from '../components/shared/InitialFormatter';
@@ -14,10 +14,10 @@ type Message = {
     role: "user" | "assistant",
     content: string
 }
+const apiService: ApiService = new ApiService();
 
 const Chat = () => {
-  const [inputValue, setInputValue] = useState<string>();
-
+    const [inputValue, setInputValue] = useState<string>();
     const navigate = useNavigate();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const auth = useAuth();
@@ -32,9 +32,9 @@ const Chat = () => {
           const newMessage: Message = { role: "user", content };
           setChatMessages((prev)=> [...prev, newMessage]);
           try {
-            const chatData = await sendChatRequest(content);
+            const chatData = await apiService.sendChatRequest(content);
             setChatMessages(chatData?.chats ? [...chatData.chats] : []);
-          } catch (error){
+          } catch (error) {
             toast.error("An error occurred while generating chat completion. Error: " + error);
           }
         }
@@ -50,10 +50,10 @@ const Chat = () => {
     const handleDeleteChats = async () => {
       try {
         toast.loading("Deleting chats...", { id: "deleteChats" });
-        await deleteUserChats();
+        await apiService.deleteUserChats();
         setChatMessages([]);
         toast.success("Successfully deleted chats!", { id: "deleteChats" });
-      } catch (error){
+      } catch (error) {
         console.error(error);
         toast.error("Failed to delete chats.", { id: "deletedChats" });
       }
@@ -62,7 +62,7 @@ const Chat = () => {
     useLayoutEffect(() => {
       if (auth?.isLoggedIn && auth.user) {
         toast.loading("Loading Chats", { id: "loadchats" });
-        getUserChats().then((data) => {
+        apiService.getUserChats().then((data) => {
           setChatMessages([...data.chats]);
           toast.success("Successfully loaded chats", { id: "loadchats" });
         }).catch(error => {
