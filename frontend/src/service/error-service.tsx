@@ -16,7 +16,7 @@ export class ErrorService {
                     // proceed with the matches
                 } else {
                     // Handle the case where html is not a string
-                    console.error('html is not a string');
+                    console.error(axiosError.response.data);
                 }
 
                 let errorMessage = "";
