@@ -18,7 +18,8 @@ export class ApiService {
                 return data;
             }
         } catch (error) {
-            this.errorService.handleError(error);
+            await this.errorService.handleError(error);
+            throw error;
         }
     }
 
@@ -31,7 +32,8 @@ export class ApiService {
             const data = await res.data;
             return data;
         } catch (error) {
-            this.errorService.handleError(error);
+           await this.errorService.handleError(error);
+           throw error;
         }
     }
 
@@ -44,7 +46,8 @@ export class ApiService {
             const data = await res.data;
             return data;
         } catch (error) {
-            this.errorService.handleError(error);
+            await this.errorService.handleError(error);
+            throw error;
         }
     }
 
@@ -57,7 +60,8 @@ export class ApiService {
             const data = await res.data;
             return data;
         } catch (error) {
-            this.errorService.handleError(error);
+            await this.errorService.handleError(error);
+            throw error;
         }
     }
 
@@ -70,7 +74,8 @@ export class ApiService {
             const data = await res.data;
             return data;
         } catch (error) {
-            this.errorService.handleError(error);
+            await this.errorService.handleError(error);
+            throw error;
         }
     }
 
@@ -83,21 +88,25 @@ export class ApiService {
             const data = await res.data;
             return data;
         } catch (error) {
-            this.errorService.handleError(error);
+           await this.errorService.handleError(error);
+           throw error;
         }
     }
 
     async signupUser(name: string, email: string, password: string) {
         try {
             const res = await axios.post("/user/signup", { name, email, password });
+            console.log("response: " + res)
             if (res.status !== 200) {
-                throw new Error("Unable to signup. Status code: " + res.status + " Error: " + res.data.message);
+                console.error("Unable to signup. Status code: " + res.status + " Error: " + res.data.message);
+                throw new Error("Unable to signup. Status code: " + res.status + " Error: " + res.data.message); 
             } else {
                 const data = await res.data;
                 return data;
             }
         } catch (error) {
-            this.errorService.handleError(error);
+            await this.errorService.handleError(error);
+            throw error;
         }
     }
 }
