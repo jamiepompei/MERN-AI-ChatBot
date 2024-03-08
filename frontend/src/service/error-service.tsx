@@ -8,10 +8,8 @@ export class ErrorService {
         if (axios.isAxiosError(error)) {
             const axiosError = error as AxiosError;
             const errorMessageRegexString: string = this.ERROR_MESSAGE_REGEX.source;
-            console.error("regex: " + errorMessageRegexString)
             if (axiosError.response) {
                 const html: string = axiosError.response.data as string;
-                console.error(html);
                 let matches : RegExpMatchArray | null = null;
                 if (typeof html === 'string') {
                     matches = html.match(errorMessageRegexString);
@@ -24,10 +22,8 @@ export class ErrorService {
                 let errorMessage = "";
                 if (matches && matches.length >= 2) {
                     errorMessage = matches[1];
-                    console.log(errorMessage);
                 } else {
                     errorMessage = error.message;
-                    console.error(errorMessage);
                 }
                 throw new Error(errorMessage);
             } else if (axiosError.request) {

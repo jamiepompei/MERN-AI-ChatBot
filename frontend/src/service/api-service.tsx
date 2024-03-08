@@ -96,7 +96,6 @@ export class ApiService {
     async signupUser(name: string, email: string, password: string) {
         try {
             const res = await axios.post("/user/signup", { name, email, password });
-            console.log("response: " + res)
             if (res.status !== 200) {
                 console.error("Unable to signup. Status code: " + res.status + " Error: " + res.data.message);
                 throw new Error("Unable to signup. Status code: " + res.status + " Error: " + res.data.message); 
