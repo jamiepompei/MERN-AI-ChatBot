@@ -30,9 +30,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     setIsLoggedIn(true);
                 }
             } catch (error: unknown) {
-                if (error instanceof Error) {
-                        console.error("An error occurred while checking authentication status: ", error.message);
-                    }
                 setUser(null);
                 setIsLoggedIn(false);
             } finally {
