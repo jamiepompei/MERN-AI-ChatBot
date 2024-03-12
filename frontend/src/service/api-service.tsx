@@ -9,104 +9,115 @@ export class ApiService {
     }
 
     async loginUser(email: string, password: string) {
+        let res;
         try {
-            const res = await axios.post("/user/login", { email, password });
-            if (res.status !== 200) {
-                throw new Error ("Unable to login. Status code: " + res.status + "Error: " + res.data.message);
-            } else {
-                const data = await res.data;
-                return data;
-            }
+            res = await axios.post("/user/login", { email, password });
         } catch (error) {
             await this.errorService.handleError(error);
             throw error;
         }
+
+        if (res.status !== 200) {
+            throw new Error ("Unable to login. Status code: " + res.status + "Error: " + res.data.message);
+        }
+        
+        return res.data;
     }
+    
 
     async sendChatRequest(message: string) {
+        let res;
         try {
-            const res = await axios.post("/chat/new", { message } );
-            if (res.status !== 200) {
-                throw new Error("Could not handle chat. Error: " + res.data.message);
-            }
-            const data = await res.data;
-            return data;
+            res = await axios.post("/chat/new", { message } );
         } catch (error) {
            await this.errorService.handleError(error);
            throw error;
         }
+
+        if (res.status !== 200) {
+            throw new Error("Could not handle chat. Error: " + res.data.message);
+        }
+
+        return res.data;
     }
 
     async checkAuthStatus() {
+        let res;
         try {
-            const res = await axios.get("/user/auth-status");
-            if (res.status !== 200) {
-                throw new Error("Unable to authenticate! Error: " + res.data.message);
-            }
-            const data = await res.data;
-            return data;
+            res = await axios.get("/user/auth-status");
         } catch (error) {
             await this.errorService.handleError(error);
             throw error;
         }
+        if (res.status !== 200) {
+            throw new Error("Unable to authenticate! Error: " + res.data.message);
+        }
+        return res.data;
     }
 
     async getUserChats() {
+        let res;
         try {
-            const res = await axios.get("/chat/all-chats");
-            if (res.status !== 200) {
-                throw new Error("Could not get chats.Error: " + res.data.message);
-            }
-            const data = await res.data;
-            return data;
+            res = await axios.get("/chat/all-chats");
         } catch (error) {
             await this.errorService.handleError(error);
             throw error;
         }
+        if (res.status !== 200) {
+            throw new Error("Could not get chats.Error: " + res.data.message);
+        }
+        return res.data;
     }
 
     async deleteUserChats() {
+        let res;
         try {
-            const res = await axios.delete("/chat/delete");
-            if (res.status !== 200) {
-                throw new Error("Could not delete chats. Error: " + res.data.message);
-            }
-            const data = await res.data;
-            return data;
+            res = await axios.delete("/chat/delete");
         } catch (error) {
             await this.errorService.handleError(error);
             throw error;
         }
+
+        if (res.status !== 200) {
+            throw new Error("Could not delete chats. Error: " + res.data.message);
+        }
+
+        return res.data;
     }
 
     async logOutUser() {
+        let res;
         try {
-            const res = await axios.get("/user/logout");
-            if (res.status !== 200) {
-                throw new Error("Could not log user out. Error: " + res.data.message);
-            }
-            const data = await res.data;
-            return data;
+            res = await axios.get("/user/logout");
         } catch (error) {
            await this.errorService.handleError(error);
            throw error;
         }
+
+        if (res.status !== 200) {
+            throw new Error("Could not log user out. Error: " + res.data.message);
+        }
+
+        return res.data;
     }
 
     async signupUser(name: string, email: string, password: string) {
+        let res;
         try {
-            const res = await axios.post("/user/signup", { name, email, password });
-            if (res.status !== 200) {
-                console.error("Unable to signup. Status code: " + res.status + " Error: " + res.data.message);
-                throw new Error("Unable to signup. Status code: " + res.status + " Error: " + res.data.message); 
-            } else {
-                const data = await res.data;
-                return data;
-            }
+            res = await axios.post("/user/signup", { name, email, password });
         } catch (error) {
             await this.errorService.handleError(error);
             throw error;
         }
+
+        if (res.status !== 200) {
+            const errorString: string = "Unable to signup. Status code: " + res.status + " Error: " + res.data.message;
+            console.error(errorString);
+            throw new Error(errorString); 
+
+        } 
+
+        return res.data;
     }
 }
 
