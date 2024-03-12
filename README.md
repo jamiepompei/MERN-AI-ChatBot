@@ -13,3 +13,5 @@ Technologies: MERN Stack, OpenAI, JWT Tokens, HTTP-Only Cookies, Signed Cookies,
 <br>
 To run this project locally, clone down the repo. CD into backend folder and run 'npm run dev' to run the server. CD into frontend folder and run 'npm run dev' to run the frontend. 
 
+Please note, you must provide your own values to the configurations in backend/.env file to run this application locally. 
+
