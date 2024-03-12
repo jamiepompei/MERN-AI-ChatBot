@@ -199,12 +199,16 @@ const Chat = () => {
               type="text"
               style={{
                 width: "100%",
+                height: "auto",
+                minHeight: "50px",
                 backgroundColor: "transparent",
-                padding: "30px",
+                padding: "10px",
                 border: "none",
                 outline: "none",
                 color: "white",
                 fontSize: "20px",
+                resize: "none",
+                overflowY: "auto"
               }}
               onKeyDown={handleKeyDown}
             />
