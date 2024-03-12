@@ -41,13 +41,13 @@ const ChatItem = ({
             <img src="openai.png" alt="openai" width={"30px"} />
             </Avatar>
             <Box>
-                {!messageBlocks && (<Typography sx={{ fontSize: "20px" }}>{ content }</Typography>)} 
-                {messageBlocks && messageBlocks.length && messageBlocks.map((block, index) => isCodeBlock(block) ? 
-                    <SyntaxHighlighter key={index} style={coldarkCold} language="javascript">
+                {!messageBlocks && (<Typography sx={{ fontSize: "20px", wordWrap: "break-word", wordBreak: "break-word" }}>{ content }</Typography>)} 
+                {messageBlocks && messageBlocks.length && messageBlocks.map((block) => isCodeBlock(block) ? 
+                    <SyntaxHighlighter key={block} style={coldarkCold} language="javascript">
                         {block}
                     </SyntaxHighlighter> 
                     : 
-                    <Typography key={index} sx={{ fontSize: "20px" }}>{ block }</Typography> )}
+                    <Typography key={block} sx={{ fontSize: "20px", wordWrap: "break-word", wordBreak: "break-word" }}>{ block }</Typography> )}
             </Box>
         </Box>
         ) : ( 
@@ -56,13 +56,13 @@ const ChatItem = ({
             {formatNameToInitials(auth?.user?.name)}
             </Avatar>
             <Box>
-                {!messageBlocks && (<Typography sx={{ fontSize: "20px" }}>{ content }</Typography>)}
+                {!messageBlocks && (<Typography sx={{ fontSize: "20px", wordWrap: "break-word", wordBreak: "break-word" }}>{ content }</Typography>)}
                 {messageBlocks && messageBlocks.length && messageBlocks.map((block) => isCodeBlock(block) ? 
                     <SyntaxHighlighter style={coldarkCold} language="javascript">
                         {block}
                     </SyntaxHighlighter> 
                     : 
-                    <Typography sx={{ fontSize: "20px" }}>{ block }</Typography> )}
+                    <Typography sx={{ fontSize: "20px", wordWrap: "break-word", wordBreak: "break-word" }}>{ block }</Typography> )}
             </Box>
         </Box>
         );
