@@ -17,7 +17,7 @@ type Message = {
 const apiService: ApiService = new ApiService();
 
 const Chat = () => {
-    const [inputValue, setInputValue] = useState<string>();
+    const [inputValue, setInputValue] = useState<string>("");
     const navigate = useNavigate();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const auth = useAuth();
@@ -173,9 +173,8 @@ const Chat = () => {
               mx: "auto",
               display: "flex",
               flexDirection: "column",
-              overflow: "scroll",
               overflowX: "hidden",
-              overflowY: "auto",
+              wordWrap: "break-word",
               scrollBehavior: "smooth",
             }}
           >
@@ -189,7 +188,7 @@ const Chat = () => {
               borderRadius: 8,
               backgroundColor: "rgb(17,27,39)",
               display: "flex",
-              margin: "auto",
+              margin: "auto"
             }}
           >
             {" "}
@@ -199,7 +198,6 @@ const Chat = () => {
               type="text"
               style={{
                 width: "100%",
-                height: "auto",
                 minHeight: "50px",
                 backgroundColor: "transparent",
                 padding: "10px",
@@ -208,7 +206,7 @@ const Chat = () => {
                 color: "white",
                 fontSize: "20px",
                 resize: "none",
-                overflowY: "auto"
+                height:'auto' 
               }}
               onKeyDown={handleKeyDown}
             />
